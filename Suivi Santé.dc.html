@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#08090c;}
+    *{box-sizing:border-box;}
+    ::-webkit-scrollbar{width:0;height:0;}
+    input:focus{outline:none;}
+  </style>
+</helmet>
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" dark="{{true}}" hint-size="412,892" style="margin:32px auto;display:block;">
+  <div style="width:100%;height:100%;background:{{colors.bg}};display:flex;flex-direction:column;position:relative;font-family:'Manrope',sans-serif;overflow:hidden;">
+
+    <div style="flex:1;overflow-y:auto;padding:20px 20px 12px;">
+
+      <!-- ============ ACCUEIL ============ -->
+      <sc-if value="{{isAccueil}}" hint-placeholder-val="{{true}}">
+        <div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(155deg,#1d1e23,#111217);border:1.5px solid rgba(234,182,63,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <rect x="3.2" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                  <rect x="17.8" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                  <rect x="1" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                  <rect x="21.4" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                  <rect x="6.2" y="11" width="11.6" height="2" rx="1" fill="{{colors.gold}}"></rect>
+                </svg>
+              </div>
+              <div>
+                <div style="font-size:26px;font-weight:800;color:{{colors.text}};letter-spacing:-0.3px;">Bonjour</div>
+                <div style="font-size:14px;font-weight:600;color:{{colors.textDim}};margin-top:4px;">{{today.longLabel}}</div>
+              </div>
+            </div>
+            <div style="width:42px;height:42px;border-radius:50%;background:{{colors.card}};border:1px solid {{colors.border}};display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9z" stroke="{{colors.text}}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke="{{colors.text}}" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <div style="position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:{{colors.gold}};"></div>
+            </div>
+          </div>
+
+          <!-- Weight card -->
+          <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:20px;padding:20px;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div style="font-size:15px;font-weight:700;color:{{colors.textDim}};">Poids</div>
+              <div style="background:rgba(234,182,63,0.14);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:700;color:{{colors.gold}};">Objectif {{weight.goal}} kg</div>
+            </div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;">
+              <div style="display:flex;align-items:baseline;gap:6px;">
+                <span style="font-size:44px;font-weight:800;color:{{colors.text}};letter-spacing:-1px;">{{weight.currentLabel}}</span>
+                <span style="font-size:17px;font-weight:600;color:{{colors.textDim}};">kg</span>
+              </div>
+              <div style="font-size:14px;font-weight:700;color:{{weight.deltaColor}};white-space:nowrap;">{{weight.toGoLabel}}</div>
+            </div>
+            <svg width="100%" height="90" viewBox="0 0 340 90" preserveAspectRatio="none" style="display:block;margin-bottom:14px;">
+              <path d="{{weight.sparkArea}}" fill="rgba(234,182,63,0.16)"></path>
+              <path d="{{weight.sparkLine}}" fill="none" stroke="{{colors.gold}}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <div style="height:8px;border-radius:999px;background:{{colors.track}};overflow:hidden;margin-bottom:10px;">
+              <div style="height:100%;border-radius:999px;background:{{colors.gold}};width:{{weight.pctLabel}};"></div>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:{{colors.textDim}};margin-bottom:16px;">{{weight.pctText}}</div>
+            <div style="width:100%;background:{{colors.gold}};color:#191307;border:none;border-radius:999px;padding:16px 0;text-align:center;font-size:16px;font-weight:800;cursor:pointer;" onClick="{{openWeightModal}}">+ Peser aujourd'hui</div>
+          </div>
+
+          <!-- 2x2 grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:100%;font-size:14px;font-weight:700;color:{{colors.textDim}};margin-bottom:10px;">Eau</div>
+              <div style="position:relative;width:112px;height:112px;">
+                <svg width="112" height="112" viewBox="0 0 112 112" style="transform:rotate(-90deg);">
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="{{colors.track}}" stroke-width="10"></circle>
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="{{colors.water}}" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{water.circumference}}" stroke-dashoffset="{{water.offset}}"></circle>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div style="font-size:22px;font-weight:800;color:{{colors.text}};">{{water.currentLabel}}</div>
+                  <div style="font-size:11.5px;font-weight:600;color:{{colors.textDim}};">L / {{water.goal}}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:14px;width:100%;">
+                <div style="flex:1;height:40px;border-radius:999px;background:{{colors.trackSoft}};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:{{colors.text}};cursor:pointer;" onClick="{{decWater}}">−</div>
+                <div style="flex:1;height:40px;border-radius:999px;background:{{colors.waterSoft}};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:{{colors.water}};cursor:pointer;" onClick="{{incWater}}">+</div>
+              </div>
+            </div>
+
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:100%;font-size:14px;font-weight:700;color:{{colors.textDim}};margin-bottom:10px;">Activité</div>
+              <div style="position:relative;width:112px;height:112px;">
+                <svg width="112" height="112" viewBox="0 0 112 112" style="transform:rotate(-90deg);">
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="{{colors.track}}" stroke-width="10"></circle>
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="{{colors.activity}}" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{activity.circumference}}" stroke-dashoffset="{{activity.offset}}"></circle>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div style="font-size:22px;font-weight:800;color:{{colors.text}};">{{activity.current}}</div>
+                  <div style="font-size:11.5px;font-weight:600;color:{{colors.textDim}};">min / {{activity.goal}}</div>
+                </div>
+              </div>
+              <div style="width:100%;height:40px;border-radius:999px;background:{{colors.activitySoft}};display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;cursor:pointer;" onClick="{{openActivityModal}}">
+                <span style="font-size:14px;font-weight:700;color:{{colors.activity}};">+ Ajouter</span>
+              </div>
+            </div>
+
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;">
+              <div style="width:100%;font-size:14px;font-weight:700;color:{{colors.textDim}};margin-bottom:10px;">Jeûne</div>
+              <div style="position:relative;width:112px;height:112px;">
+                <svg width="112" height="112" viewBox="0 0 112 112" style="transform:rotate(-90deg);">
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="{{colors.track}}" stroke-width="10"></circle>
+                  <circle cx="56" cy="56" r="47" fill="none" stroke="{{colors.fasting}}" stroke-width="10" stroke-linecap="round" stroke-dasharray="{{fasting.circumference}}" stroke-dashoffset="{{fasting.offset}}"></circle>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                  <div style="font-size:22px;font-weight:800;color:{{colors.text}};">{{fasting.currentLabel}}</div>
+                  <div style="font-size:11.5px;font-weight:600;color:{{colors.textDim}};">/ {{fasting.goalLabel}}</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:14px;width:100%;">
+                <div style="flex:1;height:40px;border-radius:999px;background:{{colors.trackSoft}};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:{{colors.text}};cursor:pointer;" onClick="{{decFasting}}">−</div>
+                <div style="flex:1;height:40px;border-radius:999px;background:{{colors.fastingSoft}};display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:{{colors.fasting}};cursor:pointer;" onClick="{{incFasting}}">+</div>
+              </div>
+            </div>
+
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:20px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" onClick="{{goToJournal}}">
+              <div style="width:100%;font-size:14px;font-weight:700;color:{{colors.textDim}};margin-bottom:16px;">Repas du jour</div>
+              <div style="width:78px;height:78px;border-radius:50%;background:{{colors.mealsSoft}};display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:30px;font-weight:800;color:{{colors.meals}};">{{mealsTodayCount}}</span>
+              </div>
+              <div style="font-size:12px;font-weight:600;color:{{colors.textDim}};margin-top:14px;">Voir le journal →</div>
+            </div>
+
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ============ POIDS ============ -->
+      <sc-if value="{{isPoids}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+            <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(155deg,#1d1e23,#111217);border:1.5px solid rgba(234,182,63,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="3.2" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                <rect x="17.8" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                <rect x="1" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                <rect x="21.4" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                <rect x="6.2" y="11" width="11.6" height="2" rx="1" fill="{{colors.gold}}"></rect>
+              </svg>
+            </div>
+            <div style="font-size:24px;font-weight:800;color:{{colors.text}};letter-spacing:-0.3px;">Suivi du poids</div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px;">
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:16px;padding:14px 8px;text-align:center;">
+              <div style="font-size:12px;font-weight:600;color:{{colors.textDim}};margin-bottom:6px;">Départ</div>
+              <div style="font-size:19px;font-weight:800;color:{{colors.text}};">{{weight.startLabel}}</div>
+            </div>
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:16px;padding:14px 8px;text-align:center;">
+              <div style="font-size:12px;font-weight:600;color:{{colors.textDim}};margin-bottom:6px;">Actuel</div>
+              <div style="font-size:19px;font-weight:800;color:{{colors.gold}};">{{weight.currentLabel}}</div>
+            </div>
+            <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:16px;padding:14px 8px;text-align:center;">
+              <div style="font-size:12px;font-weight:600;color:{{colors.textDim}};margin-bottom:6px;">Objectif</div>
+              <div style="font-size:19px;font-weight:800;color:{{colors.text}};">{{weight.goal}}</div>
+            </div>
+          </div>
+
+          <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:20px;padding:18px;margin-bottom:18px;">
+            <svg width="100%" height="160" viewBox="0 0 340 160" preserveAspectRatio="none" style="display:block;">
+              <path d="{{annual.areaPath}}" fill="rgba(234,182,63,0.14)"></path>
+              <line x1="0" y1="{{annual.goalY}}" x2="340" y2="{{annual.goalY}}" stroke="rgba(245,245,247,0.35)" stroke-width="1.5" stroke-dasharray="5,5"></line>
+              <path d="{{annual.linePath}}" fill="none" stroke="{{colors.gold}}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+            <div style="display:flex;justify-content:space-between;margin-top:10px;">
+              <span style="font-size:12px;font-weight:600;color:{{colors.textDim}};">Jan</span>
+              <span style="font-size:12px;font-weight:600;color:{{colors.textDim}};">Mar</span>
+              <span style="font-size:12px;font-weight:600;color:{{colors.textDim}};">Mai</span>
+              <span style="font-size:12px;font-weight:600;color:{{colors.textDim}};">Jul</span>
+            </div>
+          </div>
+
+          <div style="width:100%;background:{{colors.gold}};color:#191307;border:none;border-radius:999px;padding:16px 0;text-align:center;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:24px;" onClick="{{openWeightModal}}">+ Ajouter une pesée</div>
+
+          <div style="font-size:18px;font-weight:800;color:{{colors.text}};margin-bottom:8px;">Historique</div>
+          <sc-for list="{{weight.historyList}}" as="row" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 2px;border-bottom:1px solid {{colors.border}};">
+              <div style="font-size:14.5px;font-weight:600;color:{{colors.textDim}};">{{row.dateLabel}}</div>
+              <div style="display:flex;align-items:center;gap:14px;">
+                <span style="font-size:16px;font-weight:800;color:{{colors.text}};">{{row.weightLabel}}</span>
+                <span style="font-size:13.5px;font-weight:700;color:{{row.deltaColor}};min-width:38px;text-align:right;">{{row.deltaLabel}}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- ============ JOURNAL ============ -->
+      <sc-if value="{{isJournal}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+            <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(155deg,#1d1e23,#111217);border:1.5px solid rgba(234,182,63,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="3.2" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                <rect x="17.8" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                <rect x="1" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                <rect x="21.4" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                <rect x="6.2" y="11" width="11.6" height="2" rx="1" fill="{{colors.gold}}"></rect>
+              </svg>
+            </div>
+            <div style="font-size:24px;font-weight:800;color:{{colors.text}};letter-spacing:-0.3px;">Journal des repas</div>
+          </div>
+
+          <div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:20px;padding-bottom:2px;">
+            <sc-for list="{{journal.days}}" as="d" hint-placeholder-count="7">
+              <div style="flex:none;width:56px;padding:12px 0;border-radius:14px;text-align:center;cursor:pointer;background:{{d.bg}};border:1px solid {{d.border}};" onClick="{{d.onClick}}">
+                <div style="font-size:12px;font-weight:700;color:{{d.color}};margin-bottom:4px;">{{d.label}}</div>
+                <div style="font-size:17px;font-weight:800;color:{{d.color}};">{{d.num}}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-size:14.5px;font-weight:700;color:{{colors.textDim}};margin-bottom:14px;">{{journal.selectedLabel}}</div>
+
+          <sc-if value="{{journal.hasMeals}}" hint-placeholder-val="{{true}}">
+            <sc-for list="{{journal.meals}}" as="m" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:14px;background:{{colors.card}};border:1px solid {{colors.border}};border-radius:18px;padding:14px;margin-bottom:12px;">
+                <div style="width:56px;height:56px;border-radius:14px;flex-shrink:0;background:repeating-linear-gradient(135deg,#232428,#232428 6px,#2b2c31 6px,#2b2c31 12px);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-size:10px;font-weight:700;color:rgba(245,245,247,0.4);">photo</span>
+                </div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:15px;font-weight:700;color:{{colors.text}};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{m.name}}</div>
+                  <div style="font-size:13px;font-weight:600;color:{{colors.textDim}};margin-top:3px;">{{m.time}}</div>
+                </div>
+                <div style="background:{{colors.mealsSoft}};color:{{colors.meals}};border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:700;white-space:nowrap;">{{m.type}}</div>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{journal.emptyState}}" hint-placeholder-val="{{false}}">
+            <div style="text-align:center;padding:60px 20px;color:{{colors.textDim}};font-size:14px;font-weight:600;">Aucun repas enregistré pour ce jour.</div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ============ REGLAGES ============ -->
+      <sc-if value="{{isReglages}}" hint-placeholder-val="{{false}}">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(155deg,#1d1e23,#111217);border:1.5px solid rgba(234,182,63,0.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <rect x="3.2" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                <rect x="17.8" y="8" width="3" height="8" rx="1" fill="{{colors.gold}}"></rect>
+                <rect x="1" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                <rect x="21.4" y="10" width="1.6" height="4" rx="0.6" fill="{{colors.gold}}"></rect>
+                <rect x="6.2" y="11" width="11.6" height="2" rx="1" fill="{{colors.gold}}"></rect>
+              </svg>
+            </div>
+            <div style="font-size:24px;font-weight:800;color:{{colors.text}};letter-spacing:-0.3px;">Réglages</div>
+          </div>
+
+          <div style="font-size:12.5px;font-weight:800;color:{{colors.textDim}};letter-spacing:1px;margin-bottom:10px;">OBJECTIF</div>
+          <div style="display:flex;background:{{colors.card}};border:1px solid {{colors.border}};border-radius:18px;margin-bottom:26px;overflow:hidden;">
+            <div style="flex:1;text-align:center;padding:16px 0;border-right:1px solid {{colors.border}};">
+              <div style="font-size:12px;font-weight:600;color:{{colors.textDim}};margin-bottom:6px;">Départ</div>
+              <div style="font-size:18px;font-weight:800;color:{{colors.text}};">{{weight.startLabel}} kg</div>
+            </div>
+            <div style="flex:1;text-align:center;padding:16px 0;">
+              <div style="font-size:12px;font-weight:600;color:{{colors.textDim}};margin-bottom:6px;">Objectif</div>
+              <div style="font-size:18px;font-weight:800;color:{{colors.gold}};">{{weight.goal}} kg</div>
+            </div>
+          </div>
+
+          <div style="font-size:12.5px;font-weight:800;color:{{colors.textDim}};letter-spacing:1px;margin-bottom:10px;">NOTIFICATIONS</div>
+          <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:18px;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px;border-bottom:1px solid {{colors.border}};">
+              <div>
+                <div style="font-size:15px;font-weight:700;color:{{colors.text}};">Rappel de pesée</div>
+                <div style="font-size:13px;font-weight:600;color:{{colors.textDim}};margin-top:3px;">Tous les jours à 8h00</div>
+              </div>
+              <div style="width:48px;height:28px;border-radius:999px;background:{{settings.weighInBg}};position:relative;cursor:pointer;flex-shrink:0;" onClick="{{toggleWeighIn}}">
+                <div style="position:absolute;top:3px;left:{{settings.weighInPos}};width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s;"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px;border-bottom:1px solid {{colors.border}};">
+              <div>
+                <div style="font-size:15px;font-weight:700;color:{{colors.text}};">Rappel de boire de l'eau</div>
+                <div style="font-size:13px;font-weight:600;color:{{colors.textDim}};margin-top:3px;">Toutes les 2 heures</div>
+              </div>
+              <div style="width:48px;height:28px;border-radius:999px;background:{{settings.hydrationBg}};position:relative;cursor:pointer;flex-shrink:0;" onClick="{{toggleHydration}}">
+                <div style="position:absolute;top:3px;left:{{settings.hydrationPos}};width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s;"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px;">
+              <div>
+                <div style="font-size:15px;font-weight:700;color:{{colors.text}};">Rappel d'activité physique</div>
+                <div style="font-size:13px;font-weight:600;color:{{colors.textDim}};margin-top:3px;">Tous les jours à 18h00</div>
+              </div>
+              <div style="width:48px;height:28px;border-radius:999px;background:{{settings.activityBg}};position:relative;cursor:pointer;flex-shrink:0;" onClick="{{toggleActivity}}">
+                <div style="position:absolute;top:3px;left:{{settings.activityPos}};width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+
+    <!-- Floating add-meal button -->
+    <sc-if value="{{isJournal}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;right:22px;bottom:88px;width:58px;height:58px;border-radius:50%;background:{{colors.gold}};display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(234,182,63,0.35);cursor:pointer;" onClick="{{openMealModal}}">
+        <span style="font-size:26px;font-weight:800;color:#191307;">+</span>
+      </div>
+    </sc-if>
+
+    <!-- Bottom tab bar -->
+    <div style="display:flex;border-top:1px solid {{colors.border}};background:{{colors.bg}};padding:10px 6px 14px;flex-shrink:0;">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;" onClick="{{goToAccueil}}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 11.5L12 4l9 7.5" stroke="{{tabs.accueilColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1v-9" stroke="{{tabs.accueilColor}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:11.5px;font-weight:700;color:{{tabs.accueilColor}};">Accueil</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;" onClick="{{goToPoids}}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="{{tabs.poidsColor}}" stroke-width="2"/><circle cx="12" cy="12" r="2" fill="{{tabs.poidsColor}}"/></svg>
+        <span style="font-size:11.5px;font-weight:700;color:{{tabs.poidsColor}};">Poids</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;" onClick="{{goToJournal}}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="{{tabs.journalColor}}" stroke-width="2" stroke-linecap="round"/></svg>
+        <span style="font-size:11.5px;font-weight:700;color:{{tabs.journalColor}};">Journal</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;" onClick="{{goToReglages}}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0" stroke="{{tabs.reglagesColor}}" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="6" r="2.3" fill="{{colors.bg}}" stroke="{{tabs.reglagesColor}}" stroke-width="2"/><circle cx="16" cy="18" r="2.3" fill="{{colors.bg}}" stroke="{{tabs.reglagesColor}}" stroke-width="2"/><circle cx="6" cy="12" r="2.3" fill="{{colors.bg}}" stroke="{{tabs.reglagesColor}}" stroke-width="2"/></svg>
+        <span style="font-size:11.5px;font-weight:700;color:{{tabs.reglagesColor}};">Réglages</span>
+      </div>
+    </div>
+
+    <!-- ============ MODALS ============ -->
+    <sc-if value="{{modal.isOpen}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:10;" onClick="{{closeModal}}"></div>
+
+      <sc-if value="{{modal.isWeight}}" hint-placeholder-val="{{false}}">
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:{{colors.sheet}};border-radius:24px 24px 0 0;padding:22px 22px 30px;border:1px solid {{colors.border}};">
+          <div style="width:40px;height:4px;border-radius:2px;background:rgba(245,245,247,0.2);margin:0 auto 18px;"></div>
+          <div style="font-size:19px;font-weight:800;color:{{colors.text}};margin-bottom:18px;">Ajouter une pesée</div>
+          <div style="display:flex;align-items:baseline;gap:8px;background:{{colors.card}};border:1px solid {{colors.border}};border-radius:16px;padding:16px 18px;margin-bottom:20px;">
+            <input type="number" step="0.1" value="{{modal.weightInput}}" onChange="{{setWeightInput}}" placeholder="0.0" style="flex:1;background:transparent;border:none;font-size:26px;font-weight:800;color:{{colors.text}};font-family:'Manrope',sans-serif;"></input>
+            <span style="font-size:16px;font-weight:700;color:{{colors.textDim}};">kg</span>
+          </div>
+          <div style="width:100%;background:{{colors.gold}};color:#191307;border-radius:999px;padding:16px 0;text-align:center;font-size:16px;font-weight:800;cursor:pointer;" onClick="{{submitWeight}}">Enregistrer</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{modal.isActivity}}" hint-placeholder-val="{{false}}">
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:{{colors.sheet}};border-radius:24px 24px 0 0;padding:22px 22px 30px;border:1px solid {{colors.border}};">
+          <div style="width:40px;height:4px;border-radius:2px;background:rgba(245,245,247,0.2);margin:0 auto 18px;"></div>
+          <div style="font-size:19px;font-weight:800;color:{{colors.text}};margin-bottom:18px;">Ajouter de l'activité</div>
+          <div style="display:flex;gap:10px;margin-bottom:20px;">
+            <sc-for list="{{activityPresets}}" as="p" hint-placeholder-count="3">
+              <div style="flex:1;text-align:center;padding:16px 0;border-radius:16px;background:{{colors.activitySoft}};color:{{colors.activity}};font-size:16px;font-weight:800;cursor:pointer;" onClick="{{p.onClick}}">+{{p.value}}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;background:{{colors.card}};border:1px solid {{colors.border}};border-radius:16px;padding:16px 18px;margin-bottom:20px;">
+            <input type="number" value="{{modal.activityInput}}" onChange="{{setActivityInput}}" placeholder="0" style="flex:1;background:transparent;border:none;font-size:26px;font-weight:800;color:{{colors.text}};font-family:'Manrope',sans-serif;"></input>
+            <span style="font-size:16px;font-weight:700;color:{{colors.textDim}};">minutes</span>
+          </div>
+          <div style="width:100%;background:{{colors.gold}};color:#191307;border-radius:999px;padding:16px 0;text-align:center;font-size:16px;font-weight:800;cursor:pointer;" onClick="{{submitActivity}}">Ajouter</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{modal.isMeal}}" hint-placeholder-val="{{false}}">
+        <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:{{colors.sheet}};border-radius:24px 24px 0 0;padding:22px 22px 30px;max-height:82%;overflow-y:auto;border:1px solid {{colors.border}};">
+          <div style="width:40px;height:4px;border-radius:2px;background:rgba(245,245,247,0.2);margin:0 auto 18px;"></div>
+          <div style="font-size:19px;font-weight:800;color:{{colors.text}};margin-bottom:18px;">Ajouter un repas</div>
+
+          <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+            <sc-for list="{{mealTypes}}" as="t" hint-placeholder-count="4">
+              <div style="padding:10px 14px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;background:{{t.bg}};color:{{t.color}};border:1px solid {{t.border}};" onClick="{{t.onClick}}">{{t.label}}</div>
+            </sc-for>
+          </div>
+
+          <div style="background:{{colors.card}};border:1px solid {{colors.border}};border-radius:16px;padding:14px 16px;margin-bottom:16px;">
+            <input type="text" value="{{modal.mealName}}" onChange="{{setMealName}}" placeholder="Nom du repas" style="width:100%;background:transparent;border:none;font-size:16px;font-weight:700;color:{{colors.text}};font-family:'Manrope',sans-serif;"></input>
+          </div>
+
+          <div style="width:100%;height:120px;border-radius:16px;background:repeating-linear-gradient(135deg,#232428,#232428 8px,#2b2c31 8px,#2b2c31 16px);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+            <span style="font-size:13px;font-weight:700;color:rgba(245,245,247,0.4);">photo</span>
+          </div>
+
+          <div style="width:100%;background:{{colors.gold}};color:#191307;border-radius:999px;padding:16px 0;text-align:center;font-size:16px;font-weight:800;cursor:pointer;" onClick="{{submitMeal}}">Ajouter le repas</div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+  </div>
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const WEIGHT_SERIES = [
+  { date: '2026-01-05', weight: 83.5 },
+  { date: '2026-01-19', weight: 82.9 },
+  { date: '2026-02-02', weight: 82.3 },
+  { date: '2026-02-16', weight: 81.7 },
+  { date: '2026-03-02', weight: 81.1 },
+  { date: '2026-03-16', weight: 80.5 },
+  { date: '2026-03-30', weight: 79.9 },
+  { date: '2026-04-13', weight: 79.3 },
+  { date: '2026-04-27', weight: 78.5 },
+  { date: '2026-05-11', weight: 77.7 },
+  { date: '2026-05-25', weight: 77.1 },
+  { date: '2026-06-08', weight: 76.6 },
+  { date: '2026-06-22', weight: 76.0 },
+  { date: '2026-07-06', weight: 75.6 },
+];
+
+const WEEKDAY_SHORT = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
+const MONTHS_FULL = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+const MONTHS_SHORT = ['jan', 'fév', 'mar', 'avr', 'mai', 'jui', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc'];
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function toKey(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+class Component extends DCLogic {
+  state = {
+    activeTab: 'accueil',
+    weightHistory: WEIGHT_SERIES.slice(),
+    weightGoal: 70,
+    water: 1.25,
+    waterGoal: 2.0,
+    activityMin: 35,
+    activityGoal: 45,
+    fastingHr: 9,
+    fastingGoal: 14,
+    settings: { weighIn: true, hydration: true, activity: true },
+    modalType: null,
+    weightInput: '',
+    activityInput: '',
+    mealType: 'Petit-déjeuner',
+    mealName: '',
+    journalSelectedKey: toKey(new Date()),
+    meals: (() => {
+      const key = toKey(new Date());
+      const m = {};
+      m[key] = [
+        { id: 1, type: 'Petit-déjeuner', name: 'Yaourt grec & granola', time: '07:30' },
+        { id: 2, type: 'Déjeuner', name: 'Salade poulet grillé & quinoa', time: '12:45' },
+      ];
+      return m;
+    })(),
+  };
+
+  colors = {
+    bg: '#08090c',
+    card: '#141519',
+    sheet: '#1a1b20',
+    border: 'rgba(255,255,255,0.07)',
+    text: '#f5f5f7',
+    textDim: 'rgba(245,245,247,0.5)',
+    track: '#25262b',
+    trackSoft: '#1f2024',
+    gold: '#EAB63F',
+    water: '#3B9EFF',
+    waterSoft: 'rgba(59,158,255,0.16)',
+    activity: '#FF9448',
+    activitySoft: 'rgba(255,148,72,0.16)',
+    fasting: '#2DD9A3',
+    fastingSoft: 'rgba(45,217,163,0.16)',
+    meals: '#A78BFA',
+    mealsSoft: 'rgba(167,139,250,0.16)',
+  };
+
+  ring(current, goal, radius) {
+    const c = 2 * Math.PI * radius;
+    const pct = Math.max(0, Math.min(1, goal > 0 ? current / goal : 0));
+    return { circumference: c.toFixed(2), offset: (c * (1 - pct)).toFixed(2) };
+  }
+
+  buildChart(values, w, h, padTop, padBottom, extra) {
+    const all = extra !== undefined ? values.concat([extra]) : values;
+    const min = Math.min.apply(null, all);
+    const max = Math.max.apply(null, all);
+    const range = (max - min) || 1;
+    const n = values.length;
+    const pts = values.map((v, i) => {
+      const x = n === 1 ? 0 : (i / (n - 1)) * w;
+      const y = padTop + (1 - (v - min) / range) * (h - padTop - padBottom);
+      return [x, y];
+    });
+    const line = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(2) + ',' + p[1].toFixed(2)).join(' ');
+    const area = line + ` L${w},${h} L0,${h} Z`;
+    let goalY = null;
+    if (extra !== undefined) {
+      goalY = (padTop + (1 - (extra - min) / range) * (h - padTop - padBottom)).toFixed(2);
+    }
+    return { line, area, goalY };
+  }
+
+  goto(tab) { this.setState({ activeTab: tab }); }
+  openModal(type) { this.setState({ modalType: type, weightInput: '', activityInput: '', mealName: '', mealType: 'Petit-déjeuner' }); }
+  closeModal() { this.setState({ modalType: null }); }
+
+  submitWeight() {
+    const val = parseFloat((this.state.weightInput + '').replace(',', '.'));
+    if (!val || val <= 0) { this.closeModal(); return; }
+    const todayKey = toKey(new Date());
+    const hist = this.state.weightHistory.slice();
+    const lastIdx = hist.length - 1;
+    if (hist[lastIdx] && hist[lastIdx].date === todayKey) {
+      hist[lastIdx] = { date: todayKey, weight: val };
+    } else {
+      hist.push({ date: todayKey, weight: val });
+    }
+    this.setState({ weightHistory: hist, modalType: null });
+  }
+
+  submitActivity() {
+    const val = parseInt(this.state.activityInput, 10);
+    if (val && val > 0) {
+      this.setState(s => ({ activityMin: s.activityMin + val, modalType: null }));
+    } else {
+      this.closeModal();
+    }
+  }
+
+  submitMeal() {
+    if (!this.state.mealName.trim()) { this.closeModal(); return; }
+    const key = this.state.journalSelectedKey;
+    const meals = Object.assign({}, this.state.meals);
+    const list = (meals[key] || []).slice();
+    const now = new Date();
+    const time = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+    list.push({ id: Date.now(), type: this.state.mealType, name: this.state.mealName, time });
+    meals[key] = list;
+    this.setState({ meals, modalType: null, mealName: '' });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const c = this.colors;
+    const hist = s.weightHistory;
+    const current = hist[hist.length - 1].weight;
+    const start = hist[0].weight;
+    const goal = s.weightGoal;
+    const kgToGo = current - goal;
+    const pct = Math.max(0, Math.min(1, (start - current) / (start - goal || 1)));
+
+    const sparkVals = hist.slice(-7).map(h => h.weight);
+    const spark = this.buildChart(sparkVals, 340, 90, 8, 8);
+
+    const annualVals = hist.map(h => h.weight);
+    const annual = this.buildChart(annualVals, 340, 160, 10, 10, goal);
+
+    const historyList = hist.slice().reverse().slice(0, 8).map((h, i, arr) => {
+      const prevIdx = hist.length - 1 - i - 1;
+      const prev = hist[prevIdx];
+      const delta = prev ? (h.weight - prev.weight) : 0;
+      const d = new Date(h.date + 'T00:00:00');
+      return {
+        dateLabel: d.getDate() + ' ' + MONTHS_SHORT[d.getMonth()] + '.',
+        weightLabel: h.weight.toFixed(1) + ' kg',
+        deltaLabel: prev ? (delta > 0 ? '+' : '') + delta.toFixed(1) : '—',
+        deltaColor: delta <= 0 ? '#4ADE80' : '#FF8080',
+      };
+    });
+
+    const water = Object.assign({ current: s.water, goal: s.waterGoal, currentLabel: s.water.toFixed(2) }, this.ring(s.water, s.waterGoal, 47));
+    const activity = Object.assign({ current: s.activityMin, goal: s.activityGoal }, this.ring(s.activityMin, s.activityGoal, 47));
+    const fasting = Object.assign({ current: s.fastingHr, goal: s.fastingGoal, currentLabel: s.fastingHr + 'h', goalLabel: s.fastingGoal + 'h' }, this.ring(s.fastingHr, s.fastingGoal, 47));
+
+    const today = new Date();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const key = toKey(d);
+      const selected = key === s.journalSelectedKey;
+      days.push({
+        label: WEEKDAY_SHORT[d.getDay()],
+        num: d.getDate(),
+        color: selected ? c.gold : c.textDim,
+        bg: selected ? 'rgba(234,182,63,0.12)' : 'transparent',
+        border: selected ? c.gold : c.border,
+        onClick: () => this.setState({ journalSelectedKey: key }),
+      });
+    }
+    const selDate = new Date(s.journalSelectedKey + 'T00:00:00');
+    const selectedLabel = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'][selDate.getDay()].replace(/^./, m => m.toUpperCase()) + ' ' + selDate.getDate() + ' ' + MONTHS_FULL[selDate.getMonth()] + ' ' + selDate.getFullYear();
+    const mealsForDay = s.meals[s.journalSelectedKey] || [];
+
+    const activityPresets = [10, 20, 30].map(v => ({
+      value: v,
+      onClick: () => this.setState({ activityInput: v }),
+    }));
+
+    const mealTypeDefs = ['Petit-déjeuner', 'Déjeuner', 'Dîner', 'Collation'];
+    const mealTypes = mealTypeDefs.map(t => {
+      const active = s.mealType === t;
+      return {
+        label: t,
+        bg: active ? 'rgba(167,139,250,0.18)' : c.card,
+        color: active ? c.meals : c.textDim,
+        border: active ? c.meals : c.border,
+        onClick: () => this.setState({ mealType: t }),
+      };
+    });
+
+    const todayKey = toKey(today);
+
+    return {
+      colors: c,
+      isAccueil: s.activeTab === 'accueil',
+      isPoids: s.activeTab === 'poids',
+      isJournal: s.activeTab === 'journal',
+      isReglages: s.activeTab === 'reglages',
+      today: { longLabel: ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'][today.getDay()].replace(/^./, m => m.toUpperCase()) + ' ' + today.getDate() + ' ' + MONTHS_FULL[today.getMonth()] + ' ' + today.getFullYear() },
+      weight: {
+        goal: goal,
+        startLabel: start.toFixed(1),
+        currentLabel: current.toFixed(1),
+        toGoLabel: kgToGo <= 0 ? 'Objectif atteint !' : `+${kgToGo.toFixed(1)} kg à faire`,
+        deltaColor: kgToGo <= 0 ? '#4ADE80' : '#4ADE80',
+        sparkLine: spark.line,
+        sparkArea: spark.area,
+        pctLabel: Math.round(pct * 100) + '%',
+        pctText: Math.round(pct * 100) + '% de l\'objectif atteint',
+        historyList,
+      },
+      annual: { linePath: annual.line, areaPath: annual.area, goalY: annual.goalY },
+      water,
+      activity,
+      fasting,
+      mealsTodayCount: (s.meals[todayKey] || []).length,
+      journal: {
+        days,
+        selectedLabel,
+        meals: mealsForDay,
+        hasMeals: mealsForDay.length > 0,
+        emptyState: mealsForDay.length === 0,
+      },
+      mealTypes,
+      activityPresets,
+      settings: {
+        weighInBg: s.settings.weighIn ? c.gold : c.track,
+        weighInPos: s.settings.weighIn ? '23px' : '3px',
+        hydrationBg: s.settings.hydration ? c.water : c.track,
+        hydrationPos: s.settings.hydration ? '23px' : '3px',
+        activityBg: s.settings.activity ? c.activity : c.track,
+        activityPos: s.settings.activity ? '23px' : '3px',
+      },
+      tabs: {
+        accueilColor: s.activeTab === 'accueil' ? c.gold : c.textDim,
+        poidsColor: s.activeTab === 'poids' ? c.gold : c.textDim,
+        journalColor: s.activeTab === 'journal' ? c.gold : c.textDim,
+        reglagesColor: s.activeTab === 'reglages' ? c.gold : c.textDim,
+      },
+      modal: {
+        isOpen: !!s.modalType,
+        isWeight: s.modalType === 'weight',
+        isActivity: s.modalType === 'activity',
+        isMeal: s.modalType === 'meal',
+        weightInput: s.weightInput,
+        activityInput: s.activityInput,
+        mealName: s.mealName,
+      },
+      goToAccueil: () => this.goto('accueil'),
+      goToPoids: () => this.goto('poids'),
+      goToJournal: () => this.goto('journal'),
+      goToReglages: () => this.goto('reglages'),
+      openWeightModal: () => this.openModal('weight'),
+      openActivityModal: () => this.openModal('activity'),
+      openMealModal: () => this.openModal('meal'),
+      closeModal: () => this.closeModal(),
+      submitWeight: () => this.submitWeight(),
+      submitActivity: () => this.submitActivity(),
+      submitMeal: () => this.submitMeal(),
+      setWeightInput: e => this.setState({ weightInput: e.target.value }),
+      setActivityInput: e => this.setState({ activityInput: e.target.value }),
+      setMealName: e => this.setState({ mealName: e.target.value }),
+      incWater: () => this.setState(st => ({ water: Math.round((st.water + 0.25) * 100) / 100 })),
+      decWater: () => this.setState(st => ({ water: Math.max(0, Math.round((st.water - 0.25) * 100) / 100) })),
+      incFasting: () => this.setState(st => ({ fastingHr: st.fastingHr + 1 })),
+      decFasting: () => this.setState(st => ({ fastingHr: Math.max(0, st.fastingHr - 1) })),
+      toggleWeighIn: () => this.setState(st => ({ settings: Object.assign({}, st.settings, { weighIn: !st.settings.weighIn }) })),
+      toggleHydration: () => this.setState(st => ({ settings: Object.assign({}, st.settings, { hydration: !st.settings.hydration }) })),
+      toggleActivity: () => this.setState(st => ({ settings: Object.assign({}, st.settings, { activity: !st.settings.activity }) })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
