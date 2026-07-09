@@ -3,6 +3,9 @@ name: Android Screenshots
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   screenshots:
     runs-on: ubuntu-latest
@@ -42,7 +45,7 @@ jobs:
             adb pull /sdcard/03_journal.png screenshots/
             adb pull /sdcard/04_reglages.png screenshots/
 
-      - name: Upload screenshots
+      - name: Upload screenshots as workflow artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -57,3 +60,17 @@ jobs:
           name: instrumented-test-report
           path: app/build/reports/androidTests/connected/
           if-no-files-found: ignore
+
+      - name: Commit screenshots to the repo
+        run: |
+          mkdir -p store-listing/screenshots
+          cp screenshots/*.png store-listing/screenshots/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add store-listing/screenshots/
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Play Store screenshots [skip ci]"
+            git push
+          else
+            echo "No screenshot changes to commit"
+          fi
