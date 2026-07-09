@@ -37,7 +37,10 @@ jobs:
           script: |
             ./gradlew connectedDebugAndroidTest --stacktrace
             mkdir -p screenshots
-            adb pull /sdcard/Android/data/com.labodescms.santetracker/files/ screenshots/
+            adb pull /sdcard/01_accueil.png screenshots/
+            adb pull /sdcard/02_poids.png screenshots/
+            adb pull /sdcard/03_journal.png screenshots/
+            adb pull /sdcard/04_reglages.png screenshots/
 
       - name: Upload screenshots
         if: always()
