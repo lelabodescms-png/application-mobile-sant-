@@ -3,6 +3,9 @@ name: Android Release Build
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -44,6 +47,20 @@ jobs:
         with:
           name: app-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
+
+      - name: Commit signed AAB to the repo
+        run: |
+          mkdir -p release-artifacts
+          cp app/build/outputs/bundle/release/app-release.aab release-artifacts/app-release.aab
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add release-artifacts/app-release.aab
+          if ! git diff --cached --quiet; then
+            git commit -m "Update signed release AAB [skip ci]"
+            git push
+          else
+            echo "No AAB changes to commit"
+          fi
 
       - name: Clean up keystore
         if: always()
