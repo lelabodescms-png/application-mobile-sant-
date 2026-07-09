@@ -27,8 +27,13 @@ class ScreenshotTest {
         composeTestRule.waitForIdle()
         Thread.sleep(400)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val dir = InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null)
-        device.takeScreenshot(File(dir, "$name.png"))
+        val dir = requireNotNull(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null)) {
+            "External files dir unavailable"
+        }
+        dir.mkdirs()
+        val file = File(dir, "$name.png")
+        check(device.takeScreenshot(file)) { "Screenshot capture failed for $name" }
+        check(file.exists()) { "Screenshot file wasn't written: $file" }
     }
 
     @Test
