@@ -6,7 +6,7 @@ principale du Store.
 ## Titre de l'app (max 30 caractères)
 
 ```
-Suivi Santé — Poids & Forme
+Health Track - Poids & Forme
 ```
 
 ## Description courte (max 80 caractères)
