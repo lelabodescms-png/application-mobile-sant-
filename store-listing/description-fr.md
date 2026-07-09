@@ -6,7 +6,7 @@ principale du Store.
 ## Titre de l'app (max 30 caractères)
 
 ```
-Health Track - Poids & Forme
+Santé PLUS MEGA
 ```
 
 ## Description courte (max 80 caractères)
@@ -18,7 +18,7 @@ Poids, eau, activité, jeûne et repas en un coup d'œil. 100% hors-ligne.
 ## Description complète (max 4000 caractères)
 
 ```
-Suivi Santé est votre carnet de bord santé quotidien, pensé pour être simple,
+Santé PLUS MEGA est votre carnet de bord santé quotidien, pensé pour être simple,
 rapide et totalement privé.
 
 PESÉE
@@ -47,7 +47,7 @@ d'activité physique.
 
 VIE PRIVÉE PAR CONCEPTION
 Toutes vos données restent sur votre téléphone. Aucun compte, aucun serveur,
-aucun tracker, aucune publicité. Suivi Santé ne collecte ni ne transmet aucune
+aucun tracker, aucune publicité. Santé PLUS MEGA ne collecte ni ne transmet aucune
 donnée à qui que ce soit.
 
 Design sombre premium, interface soignée, pensée pour un usage quotidien.
