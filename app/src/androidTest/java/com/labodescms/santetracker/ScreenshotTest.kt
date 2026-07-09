@@ -6,7 +6,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
-import java.io.File
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,6 +15,10 @@ import org.junit.runner.RunWith
  * run manually via the "Android Screenshots" CI workflow, which pulls the PNGs off the
  * emulator afterwards. Bottom-nav icons are targeted by content description (each tab's
  * label) since screen titles like "Poids" also appear as on-screen card labels.
+ *
+ * Screenshots are taken with the shell `screencap` binary (via UiDevice.executeShellCommand)
+ * straight to /sdcard, rather than UiDevice.takeScreenshot() into the app's external files
+ * dir — that path didn't resolve consistently across CI emulator images.
  */
 @RunWith(AndroidJUnit4::class)
 class ScreenshotTest {
@@ -27,13 +30,7 @@ class ScreenshotTest {
         composeTestRule.waitForIdle()
         Thread.sleep(400)
         val device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        val dir = requireNotNull(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null)) {
-            "External files dir unavailable"
-        }
-        dir.mkdirs()
-        val file = File(dir, "$name.png")
-        check(device.takeScreenshot(file)) { "Screenshot capture failed for $name" }
-        check(file.exists()) { "Screenshot file wasn't written: $file" }
+        device.executeShellCommand("screencap -p /sdcard/$name.png")
     }
 
     @Test
