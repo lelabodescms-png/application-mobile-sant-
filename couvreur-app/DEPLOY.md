@@ -1,8 +1,7 @@
 # Guide de déploiement — pour un solo founder sans équipe technique
 
 Ce guide suppose que vous ne codez pas vous-même. Chaque étape se fait via
-l'interface web d'un service (pas de terminal), sauf la toute dernière
-(copier des variables d'environnement).
+l'interface web d'un service, sans jamais ouvrir de terminal.
 
 Stack recommandée — tout en offre gratuite ou quasi-gratuite pour démarrer,
 sans serveur à gérer :
@@ -65,11 +64,9 @@ tester d'abord : le lien s'affichera à l'écran au lieu d'être envoyé par SMS
    | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Depuis l'étape 3 |
    | `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL_BASE` | Depuis l'étape 2 |
 
-5. Cliquer "Deploy". Vercel construit et met en ligne l'application.
-6. Une fois en ligne, appliquer le schéma de base de données une seule fois
-   (nécessite qu'un développeur exécute `npx prisma migrate deploy` avec le
-   `DATABASE_URL` de production — c'est la seule étape qui demande un
-   terminal).
+5. Cliquer "Deploy". Vercel construit et met en ligne l'application — les
+   tables de la base de données sont créées automatiquement à ce moment-là,
+   rien à faire manuellement.
 
 ## Après le déploiement
 
