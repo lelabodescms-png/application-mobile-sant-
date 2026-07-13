@@ -69,7 +69,8 @@ export async function createMissedCall(
   try {
     const result = await sendSms(clientPhone, buildMessage(roofer, link), toSenderId(roofer.companyName));
     simulated = result.simulated;
-  } catch {
+  } catch (error) {
+    console.error("Échec de l'envoi du SMS pour la demande", token, error);
     return {
       error:
         "La demande a été créée mais l'envoi du SMS a échoué. Vous pouvez copier le lien manuellement depuis la fiche de la demande, ou réessayer l'envoi.",
