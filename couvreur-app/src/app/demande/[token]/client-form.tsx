@@ -1,9 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { submitClientForm, type ClientFormState } from "@/app/actions/public-request";
-
-const initialState: ClientFormState = {};
+import { useState, useTransition } from "react";
+import { submitClientForm } from "@/app/actions/public-request";
 
 const ROOF_TYPES = [
   "Tuiles",
@@ -15,8 +13,19 @@ const ROOF_TYPES = [
 ];
 
 export function ClientForm({ token, companyName }: { token: string; companyName: string }) {
-  const action = submitClientForm.bind(null, token);
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const [error, setError] = useState<string | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const result = await submitClientForm(token, {}, formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <div className="mx-auto w-full max-w-lg px-4 py-10">
@@ -28,7 +37,7 @@ export function ClientForm({ token, companyName }: { token: string; companyName:
         couvreur.
       </p>
 
-      <form action={formAction} className="mt-6 flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
         <Field label="Votre nom">
           <input
             name="contactName"
@@ -96,16 +105,16 @@ export function ClientForm({ token, companyName }: { token: string; companyName:
           />
         </Field>
 
-        {state.error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
 
         <button
           type="submit"
-          disabled={pending}
+          disabled={isPending}
           className="mt-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
         >
-          {pending ? "Envoi en cours..." : "Envoyer ma demande"}
+          {isPending ? "Envoi en cours..." : "Envoyer ma demande"}
         </button>
       </form>
     </div>

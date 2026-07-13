@@ -1,10 +1,10 @@
 "use server";
 
 import { z } from "zod";
-import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { savePhoto } from "@/lib/storage";
 import { RequestStatus, Urgency } from "@/generated/prisma/enums";
 
 export type ClientFormState = { error?: string };
@@ -64,16 +64,17 @@ export async function submitClientForm(
     }
   }
 
-  const uploadDir = path.join(process.cwd(), "public", "uploads", token);
-  await mkdir(uploadDir, { recursive: true });
-
   const savedPaths: string[] = [];
   for (const [index, file] of photoFiles.entries()) {
     const extension = path.extname(file.name) || ".jpg";
     const filename = `${index}-${Date.now()}${extension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadDir, filename), buffer);
-    savedPaths.push(`/uploads/${token}/${filename}`);
+    const url = await savePhoto(buffer, {
+      token,
+      filename,
+      contentType: file.type || "image/jpeg",
+    });
+    savedPaths.push(url);
   }
 
   await db.request.update({

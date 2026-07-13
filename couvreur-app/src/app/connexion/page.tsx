@@ -1,13 +1,23 @@
 "use client";
 
-import { useActionState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { login, type AuthState } from "@/app/actions/auth";
-
-const initialState: AuthState = {};
+import { login } from "@/app/actions/auth";
 
 export default function ConnexionPage() {
-  const [state, formAction, pending] = useActionState(login, initialState);
+  const [error, setError] = useState<string | undefined>();
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const result = await login({}, formData);
+      if (result?.error) {
+        setError(result.error);
+      }
+    });
+  }
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-12">
@@ -17,7 +27,7 @@ export default function ConnexionPage() {
           Accédez à votre espace pour gérer vos demandes.
         </p>
 
-        <form action={formAction} className="mt-6 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="username" className="text-sm font-medium text-zinc-700">
               Identifiant
@@ -46,16 +56,16 @@ export default function ConnexionPage() {
             />
           </div>
 
-          {state.error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>
+          {error && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
           )}
 
           <button
             type="submit"
-            disabled={pending}
+            disabled={isPending}
             className="mt-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
           >
-            {pending ? "Connexion..." : "Se connecter"}
+            {isPending ? "Connexion..." : "Se connecter"}
           </button>
         </form>
 

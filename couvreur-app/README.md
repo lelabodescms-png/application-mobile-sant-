@@ -16,9 +16,13 @@ que des couvreurs payants justifient cet investissement.
 
 ## Démarrer en local
 
+Nécessite un serveur PostgreSQL accessible (local ou distant — voir
+`DEPLOY.md` pour un fournisseur gratuit comme Neon).
+
 ```bash
 npm install
-npx prisma migrate dev   # crée la base SQLite locale (déjà fait si dev.db existe)
+cp .env.example .env      # puis renseigner DATABASE_URL au minimum
+npx prisma migrate dev
 npm run dev
 ```
 
@@ -26,32 +30,45 @@ L'application est disponible sur http://localhost:3000.
 
 ## Variables d'environnement (fichier `.env`)
 
+Voir `.env.example` pour la liste complète et commentée. Les seules
+obligatoires pour démarrer sont `DATABASE_URL` et `AUTH_SECRET` — Twilio et
+le stockage S3 sont optionnels en développement (SMS journalisés dans la
+console, photos stockées sur disque local).
+
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | Base SQLite locale (`file:./dev.db`). À remplacer par une vraie base (Postgres) en production. |
+| `DATABASE_URL` | Connexion PostgreSQL. |
 | `AUTH_SECRET` | Secret pour signer les cookies de session. **À changer avant toute mise en ligne réelle.** |
 | `APP_URL` | URL publique de l'application, utilisée dans le lien envoyé par SMS. |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Identifiants Twilio pour l'envoi réel de SMS. **Laissés vides**, les SMS sont alors simplement affichés dans les logs du serveur (mode démo), avec le lien affiché aussi à l'écran pour pouvoir tester sans compte Twilio. |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Identifiants Twilio pour l'envoi réel de SMS. Laissés vides, les SMS sont affichés dans les logs du serveur (mode démo), avec le lien affiché aussi à l'écran pour pouvoir tester sans compte Twilio. |
+| `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL_BASE` | Stockage des photos sur un service S3-compatible (Cloudflare R2, AWS S3, OVH Object Storage). Laissés vides, les photos sont stockées sur le disque local — **à ne garder que pour un premier test**, car un disque local ne survit pas à un redéploiement sur un hébergeur serverless comme Vercel. |
 
-Pour activer l'envoi réel de SMS : créer un compte sur [twilio.com](https://www.twilio.com),
-acheter un numéro (idéalement un numéro géographique français), et renseigner
-les trois variables Twilio ci-dessus.
+## Déploiement en production
 
-## Ce qui manque avant une mise en production réelle
+Voir `DEPLOY.md` — guide pas-à-pas pensé pour un solo founder sans
+compétences techniques (Vercel + Neon + Cloudflare R2 + Twilio).
 
-- **Hébergement des photos** : actuellement stockées sur le disque du
-  serveur (`public/uploads/`). À remplacer par un stockage objet (S3,
-  Cloudflare R2, OVH Object Storage) dès qu'il y a plusieurs couvreurs,
-  car le disque local ne survit pas à un redéploiement sur la plupart des
-  hébergeurs.
-- **Base de données** : SQLite convient au développement, mais une vraie
-  mise en ligne avec plusieurs couvreurs simultanés nécessite PostgreSQL
-  (Prisma migre facilement vers ce provider).
-- **`AUTH_SECRET`** : générer une vraie valeur aléatoire longue (ex. `openssl rand -base64 32`)
-  avant toute mise en ligne, et ne jamais commiter le `.env`.
-- **Détection automatique de l'appel manqué** : la V2, via un numéro
-  virtuel (Twilio Voice ou équivalent) qui déclenche l'envoi du SMS sans
-  action du couvreur.
+## Sécurité et fiabilité déjà en place
+
+- Mots de passe hashés (bcrypt), sessions signées (JWT en cookie httpOnly).
+- Verrouillage de compte après 5 tentatives de connexion échouées (15 min).
+- Numéros de téléphone normalisés au format E.164 avant l'envoi SMS (sinon
+  rejetés par la plupart des fournisseurs).
+- Renvoi manuel du SMS et copie du lien si l'envoi échoue ou si le client
+  l'a perdu.
+- En-têtes de sécurité de base (anti-clickjacking, anti-sniffing MIME).
+- Isolation stricte par couvreur (`tenant_id`) sur toutes les requêtes.
+- Tous les formulaires (connexion, inscription, appel manqué, formulaire
+  client) restent utilisables sans recharger la page après une erreur de
+  saisie — un bug de ce type a été identifié et corrigé pendant le
+  durcissement de cette V1 (voir historique Git), car il aurait bloqué
+  silencieusement un client après une simple faute de frappe.
+
+## Ce qui reste pour la V2 (hors scope de ce MVP)
+
+- **Détection automatique de l'appel manqué** via un numéro virtuel (Twilio
+  Voice ou équivalent) qui déclenche l'envoi du SMS sans action du
+  couvreur — voir l'analyse de faisabilité discutée en amont de ce projet.
 
 ## Structure du projet
 

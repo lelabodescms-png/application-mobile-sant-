@@ -6,7 +6,9 @@ import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { generateToken } from "@/lib/token";
 import { sendSms } from "@/lib/sms";
+import { toE164 } from "@/lib/phone";
 import { RequestStatus } from "@/generated/prisma/enums";
+import type { Roofer } from "@/generated/prisma/client";
 
 export type MissedCallState = {
   error?: string;
@@ -16,12 +18,12 @@ export type MissedCallState = {
 };
 
 const missedCallSchema = z.object({
-  clientPhone: z
-    .string()
-    .trim()
-    .min(6, "Numéro de téléphone invalide.")
-    .regex(/^[0-9+ .-]+$/, "Numéro de téléphone invalide."),
+  clientPhone: z.string().trim().min(6, "Numéro de téléphone invalide."),
 });
+
+function buildMessage(roofer: Roofer, link: string) {
+  return `Bonjour, vous avez essayé de joindre ${roofer.companyName}. Merci de décrire votre besoin ici (2 min) : ${link}`;
+}
 
 export async function createMissedCall(
   _prevState: MissedCallState,
@@ -37,6 +39,13 @@ export async function createMissedCall(
     return { error: parsed.error.issues[0]?.message ?? "Numéro invalide." };
   }
 
+  const clientPhone = toE164(parsed.data.clientPhone);
+  if (!clientPhone) {
+    return {
+      error: "Numéro de téléphone invalide. Utilisez un numéro français à 10 chiffres (ex : 06 12 34 56 78).",
+    };
+  }
+
   const roofer = await db.roofer.findUnique({ where: { id: session.rooferId } });
   if (!roofer) {
     return { error: "Compte introuvable." };
@@ -47,7 +56,7 @@ export async function createMissedCall(
     data: {
       token,
       rooferId: roofer.id,
-      clientPhone: parsed.data.clientPhone,
+      clientPhone,
       status: RequestStatus.LIEN_ENVOYE,
     },
   });
@@ -55,18 +64,44 @@ export async function createMissedCall(
   const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   const link = `${appUrl}/demande/${token}`;
 
-  const message = `Bonjour, vous avez essayé de joindre ${roofer.companyName}. Merci de décrire votre besoin ici (2 min) : ${link}`;
-
   let simulated = false;
   try {
-    const result = await sendSms(parsed.data.clientPhone, message);
+    const result = await sendSms(clientPhone, buildMessage(roofer, link));
     simulated = result.simulated;
   } catch {
-    return { error: "Le lien a été créé mais l'envoi du SMS a échoué. Vous pouvez copier le lien manuellement." };
+    return {
+      error:
+        "La demande a été créée mais l'envoi du SMS a échoué. Vous pouvez copier le lien manuellement depuis la fiche de la demande, ou réessayer l'envoi.",
+    };
   }
 
   revalidatePath("/dashboard");
   return { success: true, link, simulated };
+}
+
+export async function resendMissedCallSms(requestId: string) {
+  const session = await getSession();
+  if (!session) {
+    throw new Error("Vous devez être connecté.");
+  }
+
+  const request = await db.request.findFirst({
+    where: { id: requestId, rooferId: session.rooferId },
+    include: { roofer: true },
+  });
+  if (!request) {
+    throw new Error("Demande introuvable.");
+  }
+  if (request.submittedAt) {
+    throw new Error("Cette demande a déjà été remplie par le client.");
+  }
+
+  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+  const link = `${appUrl}/demande/${request.token}`;
+
+  await sendSms(request.clientPhone, buildMessage(request.roofer, link));
+
+  revalidatePath(`/dashboard/demandes/${requestId}`);
 }
 
 const statusValues = Object.values(RequestStatus) as [string, ...string[]];

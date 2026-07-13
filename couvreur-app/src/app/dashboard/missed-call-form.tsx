@@ -1,18 +1,33 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState, useTransition } from "react";
 import { createMissedCall, type MissedCallState } from "@/app/actions/requests";
-
-const initialState: MissedCallState = {};
 
 export function MissedCallForm() {
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(createMissedCall, initialState);
+  const [state, setState] = useState<MissedCallState>({});
+  const [isPending, startTransition] = useTransition();
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    startTransition(async () => {
+      const result = await createMissedCall({}, formData);
+      setState(result);
+      if (result.success) {
+        form.reset();
+      }
+    });
+  }
 
   if (!open) {
     return (
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setState({});
+          setOpen(true);
+        }}
         className="w-full rounded-xl bg-red-600 px-4 py-4 text-center text-base font-semibold text-white shadow-sm transition-colors hover:bg-red-700"
       >
         📵 Appel manqué — envoyer le lien au client
@@ -27,7 +42,7 @@ export function MissedCallForm() {
         Il recevra un SMS avec un lien pour décrire ses travaux et envoyer des photos.
       </p>
 
-      <form action={formAction} className="mt-3 flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-3">
         <input
           name="clientPhone"
           type="tel"
@@ -55,10 +70,10 @@ export function MissedCallForm() {
         <div className="flex gap-2">
           <button
             type="submit"
-            disabled={pending}
+            disabled={isPending}
             className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
           >
-            {pending ? "Envoi..." : "Envoyer le SMS"}
+            {isPending ? "Envoi..." : "Envoyer le SMS"}
           </button>
           <button
             type="button"

@@ -50,6 +50,9 @@ const loginSchema = z.object({
   password: z.string().min(1, "Mot de passe requis."),
 });
 
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
+
 export async function login(_prevState: AuthState, formData: FormData): Promise<AuthState> {
   const parsed = loginSchema.safeParse({
     username: formData.get("username"),
@@ -63,9 +66,34 @@ export async function login(_prevState: AuthState, formData: FormData): Promise<
   const { username, password } = parsed.data;
 
   const roofer = await db.roofer.findUnique({ where: { username } });
-  if (!roofer || !(await verifyPassword(password, roofer.passwordHash))) {
+
+  if (roofer?.lockedUntil && roofer.lockedUntil > new Date()) {
+    const minutesLeft = Math.ceil((roofer.lockedUntil.getTime() - Date.now()) / 60000);
+    return {
+      error: `Trop de tentatives échouées. Réessayez dans ${minutesLeft} minute(s).`,
+    };
+  }
+
+  const isValid = roofer && (await verifyPassword(password, roofer.passwordHash));
+
+  if (!isValid) {
+    if (roofer) {
+      const attempts = roofer.failedLoginAttempts + 1;
+      await db.roofer.update({
+        where: { id: roofer.id },
+        data: {
+          failedLoginAttempts: attempts,
+          lockedUntil: attempts >= MAX_LOGIN_ATTEMPTS ? new Date(Date.now() + LOCKOUT_DURATION_MS) : null,
+        },
+      });
+    }
     return { error: "Identifiant ou mot de passe incorrect." };
   }
+
+  await db.roofer.update({
+    where: { id: roofer.id },
+    data: { failedLoginAttempts: 0, lockedUntil: null },
+  });
 
   await createSession(roofer.id);
   redirect("/dashboard");

@@ -6,16 +6,18 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model Roofer {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  passwordHash String
-  companyName  String
-  createdAt    DateTime  @default(now())
-  requests     Request[]
+  id                  String    @id @default(cuid())
+  username            String    @unique
+  passwordHash        String
+  companyName         String
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime  @default(now())
+  requests            Request[]
 }
 
 enum RequestStatus {

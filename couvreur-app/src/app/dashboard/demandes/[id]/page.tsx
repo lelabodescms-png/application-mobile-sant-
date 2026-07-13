@@ -1,9 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { StatusButtons } from "./status-buttons";
+import { ResendButton } from "./resend-button";
 import { STATUS_LABELS, STATUS_COLORS, URGENCY_LABELS, URGENCY_COLORS } from "@/lib/status";
 
 export default async function RequestDetailPage({
@@ -47,9 +47,10 @@ export default async function RequestDetailPage({
         </div>
 
         {!request.submittedAt ? (
-          <p className="mt-6 rounded-lg bg-zinc-50 px-4 py-3 text-sm text-zinc-500">
-            Le client n&apos;a pas encore rempli le formulaire envoyé par SMS.
-          </p>
+          <ResendButton
+            requestId={request.id}
+            link={`${process.env.APP_URL ?? "http://localhost:3000"}/demande/${request.token}`}
+          />
         ) : (
           <div className="mt-6 flex flex-col gap-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -76,11 +77,11 @@ export default async function RequestDetailPage({
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {request.photos.map((photo) => (
                     <a key={photo.id} href={photo.path} target="_blank" rel="noreferrer">
-                      <Image
+                      {/* eslint-disable-next-line @next/next/no-img-element -- URL dynamique (disque local ou S3), domaine inconnu à l'avance */}
+                      <img
                         src={photo.path}
                         alt="Photo de la toiture"
-                        width={200}
-                        height={200}
+                        loading="lazy"
                         className="aspect-square w-full rounded-lg object-cover"
                       />
                     </a>
