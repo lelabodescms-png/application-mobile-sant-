@@ -12,7 +12,7 @@ sans serveur à gérer :
 | Hébergement de l'application | [Vercel](https://vercel.com) | Fait par les créateurs de Next.js, déploiement en un clic depuis GitHub, HTTPS automatique, gratuit pour ce volume. |
 | Base de données | [Neon](https://neon.tech) | PostgreSQL gratuit, compatible serverless, connexion en 2 minutes. |
 | Stockage des photos | [Cloudflare R2](https://developers.cloudflare.com/r2/) | 10 Go gratuits, compatible S3, pas de frais de sortie de données. |
-| Envoi de SMS | [Twilio](https://www.twilio.com) | Standard du marché, facturation à l'usage, numéro français disponible. |
+| Envoi de SMS | [Twilio](https://www.twilio.com) | Standard du marché, facturation à l'usage, pas de numéro à acheter grâce à l'Alphanumeric Sender ID. |
 
 ## 1. Créer la base de données (Neon)
 
@@ -34,12 +34,17 @@ sans stockage S3 configuré (les photos restent sur le disque local), mais
 elles seront perdues à chaque redéploiement sur Vercel — à ne garder que
 pour un premier test, pas pour de vrais clients.
 
-## 3. Créer le numéro et le compte SMS (Twilio)
+## 3. Créer le compte SMS (Twilio)
 
 1. Créer un compte sur twilio.com.
-2. Acheter un numéro (idéalement un numéro géographique français, section
-   "Phone Numbers" → "Buy a number", filtrer par pays France).
-3. Récupérer `Account SID` et `Auth Token` depuis le tableau de bord principal.
+2. Récupérer `Account SID` et `Auth Token` depuis le tableau de bord principal.
+
+Pas besoin d'acheter de numéro de téléphone : le SMS est envoyé avec le nom
+de l'entreprise de chaque couvreur comme expéditeur (Alphanumeric Sender
+ID — ex : un SMS de "CouvDupont" plutôt que d'un numéro), généré
+automatiquement par l'application à partir du nom saisi à l'inscription.
+Ce mode ne nécessite aucune inscription préalable pour envoyer vers la
+France (contrairement à d'autres pays où Twilio l'exige).
 
 Comme pour le stockage, vous pouvez déployer sans Twilio configuré pour
 tester d'abord : le lien s'affichera à l'écran au lieu d'être envoyé par SMS.
@@ -57,7 +62,7 @@ tester d'abord : le lien s'affichera à l'écran au lieu d'être envoyé par SMS
    | `DATABASE_URL` | La chaîne de connexion Neon de l'étape 1 |
    | `AUTH_SECRET` | Une valeur aléatoire longue — la générer sur [1password.com/password-generator](https://1password.com/password-generator/) (64 caractères) ou demander à votre développeur de la générer |
    | `APP_URL` | L'URL Vercel de votre app une fois déployée (ex : `https://couvreur-app.vercel.app`) |
-   | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Depuis l'étape 3 |
+   | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Depuis l'étape 3 |
    | `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL_BASE` | Depuis l'étape 2 |
 
 5. Cliquer "Deploy". Vercel construit et met en ligne l'application.

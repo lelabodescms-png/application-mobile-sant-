@@ -40,7 +40,7 @@ console, photos stockées sur disque local).
 | `DATABASE_URL` | Connexion PostgreSQL. |
 | `AUTH_SECRET` | Secret pour signer les cookies de session. **À changer avant toute mise en ligne réelle.** |
 | `APP_URL` | URL publique de l'application, utilisée dans le lien envoyé par SMS. |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER` | Identifiants Twilio pour l'envoi réel de SMS. Laissés vides, les SMS sont affichés dans les logs du serveur (mode démo), avec le lien affiché aussi à l'écran pour pouvoir tester sans compte Twilio. |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Identifiants Twilio pour l'envoi réel de SMS. Laissés vides, les SMS sont affichés dans les logs du serveur (mode démo), avec le lien affiché aussi à l'écran pour pouvoir tester sans compte Twilio. Pas besoin d'acheter de numéro de téléphone : le SMS est envoyé avec le nom de l'entreprise du couvreur comme expéditeur (Alphanumeric Sender ID), qui ne nécessite aucune inscription préalable pour envoyer vers la France. |
 | `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL_BASE` | Stockage des photos sur un service S3-compatible (Cloudflare R2, AWS S3, OVH Object Storage). Laissés vides, les photos sont stockées sur le disque local — **à ne garder que pour un premier test**, car un disque local ne survit pas à un redéploiement sur un hébergeur serverless comme Vercel. |
 
 ## Déploiement en production

@@ -7,6 +7,7 @@ import { getSession } from "@/lib/auth";
 import { generateToken } from "@/lib/token";
 import { sendSms } from "@/lib/sms";
 import { toE164 } from "@/lib/phone";
+import { toSenderId } from "@/lib/sender-id";
 import { RequestStatus } from "@/generated/prisma/enums";
 import type { Roofer } from "@/generated/prisma/client";
 
@@ -66,7 +67,7 @@ export async function createMissedCall(
 
   let simulated = false;
   try {
-    const result = await sendSms(clientPhone, buildMessage(roofer, link));
+    const result = await sendSms(clientPhone, buildMessage(roofer, link), toSenderId(roofer.companyName));
     simulated = result.simulated;
   } catch {
     return {
@@ -99,7 +100,7 @@ export async function resendMissedCallSms(requestId: string) {
   const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   const link = `${appUrl}/demande/${request.token}`;
 
-  await sendSms(request.clientPhone, buildMessage(request.roofer, link));
+  await sendSms(request.clientPhone, buildMessage(request.roofer, link), toSenderId(request.roofer.companyName));
 
   revalidatePath(`/dashboard/demandes/${requestId}`);
 }
