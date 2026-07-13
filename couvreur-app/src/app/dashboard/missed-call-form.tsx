@@ -71,7 +71,7 @@ export function MissedCallForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+            className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50"
           >
             {isPending ? "Envoi..." : "Envoyer le SMS"}
           </button>

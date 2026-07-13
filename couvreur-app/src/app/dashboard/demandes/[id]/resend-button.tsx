@@ -25,7 +25,7 @@ export function ResendButton({ requestId, link }: { requestId: string; link: str
               }
             })
           }
-          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+          className="rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50"
         >
           {isPending ? "Envoi..." : "Renvoyer le SMS"}
         </button>

@@ -112,7 +112,7 @@ export function ClientForm({ token, companyName }: { token: string; companyName:
         <button
           type="submit"
           disabled={isPending}
-          className="mt-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
+          className="mt-2 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:opacity-50"
         >
           {isPending ? "Envoi en cours..." : "Envoyer ma demande"}
         </button>

@@ -10,6 +10,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Couleur de marque des boutons principaux — à changer ici uniquement */
+  --color-brand: #0097b2;
+  --color-brand-dark: #007a91;
 }
 
 body {

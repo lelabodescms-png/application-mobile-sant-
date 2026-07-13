@@ -23,7 +23,7 @@ export function StatusButtons({
           onClick={() => startTransition(() => updateRequestStatus(requestId, status))}
           className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             status === currentStatus
-              ? "bg-zinc-900 text-white"
+              ? "bg-brand text-white"
               : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
           } disabled:opacity-50`}
         >
