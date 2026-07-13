@@ -1,0 +1,66 @@
+// Prisma schema — MVP "appel manqué" pour entreprises de couverture
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Roofer {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  companyName  String
+  createdAt    DateTime  @default(now())
+  requests     Request[]
+}
+
+enum RequestStatus {
+  LIEN_ENVOYE
+  A_TRAITER
+  DEVIS_ENVOYE
+  ACCEPTE
+  REFUSE
+}
+
+enum Urgency {
+  FAIBLE
+  NORMALE
+  URGENTE
+}
+
+model Request {
+  id            String        @id @default(cuid())
+  token         String        @unique
+  status        RequestStatus @default(LIEN_ENVOYE)
+  roofer        Roofer        @relation(fields: [rooferId], references: [id])
+  rooferId      String
+
+  // Renseigné par le couvreur au moment du clic "Appel manqué"
+  clientPhone   String
+
+  // Renseigné par le client via le formulaire public
+  description   String?
+  roofType      String?
+  address       String?
+  contactName   String?
+  contactPhone  String?
+  urgency       Urgency?
+  submittedAt   DateTime?
+
+  photos        Photo[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  requestId String
+  path      String
+  createdAt DateTime @default(now())
+}
