@@ -1,0 +1,18 @@
+export const COUNTRY_DIAL_CODES = [
+  { name: "France", dial: "+33" },
+  { name: "Belgique", dial: "+32" },
+  { name: "Suisse", dial: "+41" },
+  { name: "Luxembourg", dial: "+352" },
+  { name: "Maroc", dial: "+212" },
+  { name: "Algérie", dial: "+213" },
+  { name: "Tunisie", dial: "+216" },
+  { name: "Espagne", dial: "+34" },
+  { name: "Italie", dial: "+39" },
+  { name: "Allemagne", dial: "+49" },
+  { name: "Royaume-Uni", dial: "+44" },
+  { name: "Canada / États-Unis", dial: "+1" },
+  { name: "Côte d'Ivoire", dial: "+225" },
+  { name: "Sénégal", dial: "+221" },
+  { name: "Cameroun", dial: "+237" },
+  { name: "Autre indicatif", dial: "" },
+] as const;
