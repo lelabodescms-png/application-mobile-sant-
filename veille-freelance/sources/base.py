@@ -37,11 +37,22 @@ def can_fetch(url: str) -> bool:
         rp = RobotFileParser()
         rp.set_url(f"{domain}/robots.txt")
         try:
-            rp.read()
-        except Exception as e:
-            # Si le robots.txt est inaccessible, on n'entrave pas la source pour autant
-            # (comportement par défaut de RobotFileParser : tout est autorisé).
-            logger.warning("robots.txt illisible pour %s (%s) : on continue par défaut", domain, e)
+            # On récupère nous-mêmes le robots.txt avec notre User-Agent (via `requests`),
+            # au lieu de rp.read() qui utilise urllib sans en-têtes : certains sites
+            # (ex: Remotive) renvoient une 403 aux requêtes sans User-Agent identifiable,
+            # ce que RobotFileParser interprète alors par erreur comme "tout est interdit".
+            response = requests.get(
+                f"{domain}/robots.txt",
+                headers={"User-Agent": config.USER_AGENT},
+                timeout=config.REQUEST_TIMEOUT,
+            )
+            if response.status_code >= 400:
+                raise requests.RequestException(f"HTTP {response.status_code}")
+            rp.parse(response.text.splitlines())
+        except requests.RequestException as e:
+            # Si le robots.txt est inaccessible, on n'entrave pas la source pour autant.
+            logger.warning("robots.txt illisible pour %s (%s) : on continue par défaut (autorisé)", domain, e)
+            rp.parse([])  # aucune règle chargée = tout autorisé par défaut
         _robots_cache[domain] = rp
 
     return _robots_cache[domain].can_fetch(config.USER_AGENT, url)
