@@ -7,6 +7,8 @@ Chaque source doit rester tolérante aux pannes : en cas d'erreur (flux mort,
 timeout, structure changée...), on logue et on retourne une liste vide,
 sans jamais faire planter le scan global.
 """
+from __future__ import annotations
+
 import logging
 import re
 from urllib.parse import urlparse

@@ -10,6 +10,8 @@ Usage :
 Sources disponibles pour --test-source : codeur, graphiste, remotive, freework,
 mission_freelances, gmail
 """
+from __future__ import annotations
+
 import argparse
 import logging
 import logging.handlers
