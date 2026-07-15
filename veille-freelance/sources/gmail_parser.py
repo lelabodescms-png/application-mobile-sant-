@@ -24,6 +24,10 @@ CONFIGURATION OAuth — à faire une seule fois (voir aussi le README) :
    demander d'autoriser l'application. Une fois autorisé, un fichier
    `gmail_token.json` est créé automatiquement : il sera réutilisé (et
    rafraîchi tout seul) par les prochains scans, y compris via launchd.
+
+Ce même jeton OAuth sert aussi à l'envoi du digest quotidien par email
+(voir email_notifier.py) — c'est pour ça que les deux scopes ci-dessous
+(lecture ET envoi) sont demandés ensemble dès la première autorisation.
 --------------------------------------------------------------------------
 
 ⚠️ Les templates HTML des emails d'alerte Indeed / WTTJ changent parfois.
@@ -45,10 +49,13 @@ SOURCE_NAME_INDEED = "Indeed (Gmail)"
 SOURCE_NAME_WTTJ = "Welcome to the Jungle (Gmail)"
 IS_REMOTE_ONLY = False
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = [
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.send",
+]
 
 
-def _get_credentials():
+def get_gmail_credentials():
     """Charge/rafraîchit les identifiants OAuth Gmail. Retourne None si non configuré."""
     if not config.GMAIL_CREDENTIALS_PATH.exists():
         logger.info(
@@ -138,7 +145,7 @@ def _extract_jobs_from_html(html: str, source_name: str, date_posted: str) -> li
 
 def fetch() -> list[dict]:
     """Récupère et parse les emails d'alerte Indeed/WTTJ. Retourne [] si Gmail n'est pas configuré."""
-    creds = _get_credentials()
+    creds = get_gmail_credentials()
     if creds is None:
         return []
 

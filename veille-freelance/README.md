@@ -10,7 +10,7 @@ Sources agrégées en V1 :
 - **Codeur.com** (RSS)
 - **Graphiste.com** (RSS)
 - **Remotive** (RSS, remote international)
-- **FreeWork** (désactivée par défaut — voir section 4)
+- **FreeWork** (désactivée par défaut — voir section 3)
 - **Mission Freelances** (best-effort — idem)
 - **Gmail** (alertes Indeed / Welcome to the Jungle, via API OAuth)
 
@@ -37,38 +37,20 @@ cp .env.example .env
 
 | Variable | Description |
 |---|---|
-| `TELEGRAM_BOT_TOKEN` | Token du bot Telegram (voir section 2) |
-| `TELEGRAM_CHAT_ID` | Ton chat_id Telegram (voir section 2) |
 | `CONTACT_EMAIL` | Ton email, affiché dans le User-Agent des requêtes HTTP |
 | `GMAIL_QUERY` | Requête Gmail pour filtrer les emails d'alerte (par défaut : Indeed + WTTJ) |
 | `LOG_LEVEL` | `INFO` par défaut, passe à `DEBUG` pour plus de détails |
 
----
+Le digest quotidien est envoyé **par email** (sur ta propre adresse Gmail),
+et Gmail sert aussi de source pour lire tes alertes Indeed/WTTJ — les deux
+utilisent la même autorisation OAuth, configurée en section 2 ci-dessous.
 
-## 2. Créer le bot Telegram (BotFather)
-
-1. Ouvre Telegram et cherche **@BotFather**.
-2. Envoie `/newbot`, choisis un nom (ex: "Veille Freelance") et un identifiant
-   se terminant par `bot` (ex: `veille_freelance_bot`).
-3. BotFather te répond avec un **token** du type
-   `123456789:AAExxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` → colle-le dans
-   `TELEGRAM_BOT_TOKEN`.
-4. Pour récupérer ton **chat_id** :
-   - Envoie n'importe quel message à ton bot (cherche-le par son
-     identifiant dans Telegram et clique sur "Démarrer"/`/start`).
-   - Ouvre dans un navigateur :
-     `https://api.telegram.org/bot<TON_TOKEN>/getUpdates`
-   - Dans le JSON retourné, cherche `"chat":{"id":XXXXXXX,...}` → ce nombre
-     (potentiellement négatif) est ton `TELEGRAM_CHAT_ID`.
-5. Teste l'envoi :
-   ```bash
-   python main.py --digest
-   ```
-   (si la base est vide, tu verras juste "Aucune nouvelle offre à notifier" dans les logs — c'est normal tant qu'un scan n'a rien trouvé).
+Note : `notifier.py` (envoi via un bot Telegram) existe toujours dans le
+code si tu changes d'avis plus tard, mais n'est plus utilisé par défaut.
 
 ---
 
-## 3. Configurer Gmail (OAuth)
+## 2. Configurer Gmail (OAuth) — lecture des alertes ET envoi du digest
 
 Voir aussi les commentaires en tête de `sources/gmail_parser.py`.
 
@@ -89,9 +71,16 @@ Voir aussi les commentaires en tête de `sources/gmail_parser.py`.
    ```bash
    python main.py --test-source gmail
    ```
-   Un navigateur s'ouvre pour autoriser l'application. Une fois validé, un
-   fichier `gmail_token.json` est créé — il sera réutilisé et rafraîchi
+   Un navigateur s'ouvre pour autoriser l'application (deux permissions
+   demandées ensemble : lire tes emails et envoyer un email en ton nom —
+   la seconde sert au digest quotidien). Une fois validé, un fichier
+   `gmail_token.json` est créé — il sera réutilisé et rafraîchi
    automatiquement par les scans suivants, y compris en tâche de fond.
+8. Teste l'envoi du digest :
+   ```bash
+   python main.py --digest
+   ```
+   (si la base est vide, tu verras juste "Aucune nouvelle offre à notifier" dans les logs — c'est normal tant qu'un scan n'a rien trouvé).
 
 ⚠️ Les templates HTML des emails d'alerte évoluent de temps en temps. Si
 `--test-source gmail` ne remonte plus d'offres alors que tu reçois bien des
@@ -101,7 +90,7 @@ motifs de détection dans `_extract_jobs_from_html()`
 
 ---
 
-## 4. Tester chaque source individuellement
+## 3. Tester chaque source individuellement
 
 ```bash
 python main.py --test-source codeur
@@ -131,20 +120,20 @@ où une vraie API/RSS deviendrait disponible plus tard.
 
 ---
 
-## 5. Lancer un scan complet manuellement
+## 4. Lancer un scan complet manuellement
 
 ```bash
 python main.py --now
 ```
 
 Ceci enchaîne : scan de toutes les sources → filtrage → dédup → stockage →
-envoi immédiat du digest Telegram des nouvelles offres.
+envoi immédiat du digest par email des nouvelles offres.
 
 Pour un usage normal en deux temps (scan seul / digest seul), voir section 7.
 
 ---
 
-## 6. Ajouter une nouvelle source RSS
+## 5. Ajouter une nouvelle source RSS
 
 1. Crée `sources/ma_source.py` sur le modèle de `sources/codeur.py` :
    ```python
@@ -175,7 +164,7 @@ Pour un usage normal en deux temps (scan seul / digest seul), voir section 7.
 
 ---
 
-## 7. Éditer les mots-clés de matching
+## 6. Éditer les mots-clés de matching
 
 Tout se passe dans **`keywords.yaml`**, sans toucher au code :
 
@@ -192,11 +181,11 @@ relancé périodiquement par launchd).
 
 ---
 
-## 8. Exécution automatique (launchd, macOS)
+## 7. Exécution automatique (launchd, macOS)
 
 Deux tâches séparées :
 - **scan** : toutes les 4 heures → fetch + filtre + stockage (pas de notif)
-- **digest** : tous les jours à 9h00 → envoi du digest Telegram
+- **digest** : tous les jours à 9h00 → envoi du digest par email
 
 ### Installation
 
@@ -233,12 +222,13 @@ launchctl unload ~/Library/LaunchAgents/com.labodescms.veillefreelance.digest.pl
 - launchd ne tourne que pendant les sessions actives (le Mac doit être
   allumé ; s'il est en veille au moment prévu, macOS rattrape le job au
   réveil dans la plupart des cas mais ce n'est pas garanti à 100%).
-- La tâche Gmail nécessite d'avoir déjà autorisé l'app une première fois en
-  interactif (section 3) : launchd ne peut pas ouvrir de navigateur.
+- La tâche Gmail (lecture des alertes ET envoi du digest) nécessite d'avoir
+  déjà autorisé l'app une première fois en interactif (section 2) : launchd
+  ne peut pas ouvrir de navigateur.
 
 ---
 
-## 9. Structure du projet
+## 8. Structure du projet
 
 ```
 veille-freelance/
@@ -249,16 +239,17 @@ veille-freelance/
 ├── config.py                # constantes, chargement .env
 ├── database.py              # SQLite (missions.db)
 ├── filters.py                # remote / mots-clés / score / exclusions
-├── notifier.py               # digest Telegram
+├── email_notifier.py         # digest quotidien par email (API Gmail)
+├── notifier.py                # digest Telegram (non utilisé par défaut, gardé au cas où)
 ├── main.py                   # CLI : scan / digest / --now / --test-source
 ├── sources/
 │   ├── base.py                # utilitaires HTTP/RSS/HTML mutualisés
 │   ├── codeur.py
 │   ├── graphiste.py
 │   ├── remotive.py
-│   ├── freework.py
+│   ├── freework.py             # désactivée par défaut (voir section 3)
 │   ├── mission_freelances.py
-│   └── gmail_parser.py
+│   └── gmail_parser.py         # lecture des alertes + identifiants OAuth partagés
 └── launchd/
     ├── com.labodescms.veillefreelance.scan.plist
     └── com.labodescms.veillefreelance.digest.plist
@@ -266,7 +257,7 @@ veille-freelance/
 
 ---
 
-## 10. Base de données
+## 9. Base de données
 
 `missions.db` (SQLite, créée automatiquement) — table `missions` :
 

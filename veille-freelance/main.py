@@ -3,7 +3,7 @@ Point d'entrée de l'application de veille freelance.
 
 Usage :
     python main.py                      # scan seul (fetch + filtre + stockage), pas de notif
-    python main.py --digest             # envoie le digest Telegram des offres non notifiées
+    python main.py --digest             # envoie le digest par email des offres non notifiées
     python main.py --now                # scan + digest immédiat (test manuel complet)
     python main.py --test-source codeur # fetch brut d'une seule source, sans écrire en base
 
@@ -23,8 +23,8 @@ import logging.handlers
 
 import config
 import database
+import email_notifier
 import filters
-import notifier
 from sources import codeur, gmail_parser, graphiste, mission_freelances, remotive
 
 # Registre des sources : nom court -> module. C'est ICI qu'on ajoute une nouvelle
@@ -126,7 +126,7 @@ def _source_key_from_name(source_name: str) -> str | None:
 
 
 def run_digest() -> None:
-    """Envoie le digest Telegram des offres pas encore notifiées."""
+    """Envoie le digest par email des offres pas encore notifiées."""
     logger.info("=== Envoi du digest ===")
     database.init_db()
     missions = database.get_unnotified_missions()
@@ -135,7 +135,7 @@ def run_digest() -> None:
         logger.info("Aucune nouvelle offre à notifier.")
         return
 
-    success = notifier.send_digest(missions)
+    success = email_notifier.send_digest(missions)
     if success:
         database.mark_notified([m["id"] for m in missions])
         logger.info("Digest envoyé et %d offre(s) marquée(s) comme notifiée(s).", len(missions))
@@ -175,7 +175,7 @@ def test_single_source(name: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Veille automatisée de missions freelance.")
-    parser.add_argument("--digest", action="store_true", help="Envoie le digest Telegram immédiatement.")
+    parser.add_argument("--digest", action="store_true", help="Envoie le digest par email immédiatement.")
     parser.add_argument("--now", action="store_true", help="Lance un scan puis un digest immédiatement.")
     parser.add_argument(
         "--test-source",
