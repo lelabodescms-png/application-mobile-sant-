@@ -1,0 +1,14 @@
+# Secrets et données locales — ne jamais commiter
+.env
+gmail_credentials.json
+gmail_token.json
+missions.db
+
+# Environnement virtuel Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Logs
+logs/*.log

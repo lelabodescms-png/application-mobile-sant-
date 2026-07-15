@@ -1,0 +1,140 @@
+# =============================================================================
+# Fichier de configuration du matching — modifiable librement, sans toucher au code.
+# Toutes les comparaisons se font en minuscules et sans accents (voir filters.py),
+# donc pas besoin de dupliquer les variantes accentuées/non accentuées.
+# =============================================================================
+
+# --- Règles de détection "remote" ---
+remote:
+  # Un seul de ces mots-clés dans le titre/description suffit à considérer l'offre comme remote.
+  inclusion:
+    - remote
+    - teletravail
+    - full remote
+    - 100% remote
+    - a distance
+    - distanciel
+    - work from home
+    - fully remote
+    - anywhere
+
+  # Si un de ces mots apparaît, l'offre est exclue par défaut (sauf exception ci-dessous).
+  exclusion:
+    - hybride
+    - sur site
+    - presentiel
+    - on-site
+    - onsite
+
+  # Si un de ces mots apparaît EN PLUS d'un mot d'exclusion, l'offre est quand même gardée.
+  exception_si_present:
+    - teletravail possible
+    - remote possible
+    - full remote possible
+
+# --- Mots-clés de services (FR + EN), organisés par catégorie ---
+# Ajoutez/enlevez des lignes librement. Chaque entrée = une chaîne à rechercher
+# dans le titre + la description (recherche insensible à la casse et aux accents).
+services:
+  community_management:
+    - community management
+    - community manager
+    - social media manager
+    - social media management
+    - gestion des reseaux sociaux
+    - animation reseaux sociaux
+    - gestion reseaux sociaux
+    - instagram manager
+    - tiktok manager
+
+  creation_sites_web:
+    - creation de site web
+    - creation site internet
+    - site vitrine
+    - site wordpress
+    - wordpress
+    - wix
+    - webflow
+    - shopify
+    - developpeur web
+    - web developer
+    - landing page
+    - refonte site web
+
+  design_graphique:
+    - graphic design
+    - graphiste
+    - design graphique
+    - identite visuelle
+    - branding
+    - charte graphique
+    - logo design
+    - creation de logo
+    - figma
+    - direction artistique
+
+  marketing_digital:
+    - marketing digital
+    - strategie marketing
+    - digital marketing
+    - growth marketing
+    - marketing manager
+    - responsable marketing
+    - consultant marketing
+    - plan marketing
+
+  ads:
+    - meta ads
+    - facebook ads
+    - instagram ads
+    - tiktok ads
+    - linkedin ads
+    - google ads
+    - publicite en ligne
+    - media buyer
+    - traffic manager
+    - paid social
+    - paid media
+    - acquisition payante
+
+  creation_applications:
+    - developpement application
+    - app mobile
+    - application mobile
+    - web app
+    - application web
+    - no-code
+    - nocode
+    - bubble.io
+    - flutterflow
+
+  ugc:
+    - ugc
+    - user generated content
+    - createur de contenu
+    - content creator
+    - createur ugc
+    - video ugc
+
+  bonus:
+    - klaviyo
+    - email marketing
+    - emailing
+    - crm
+    - seo
+    - referencement naturel
+    - referencement seo
+
+# --- Mots-clés d'exclusion (offres à rejeter systematiquement) ---
+exclusions:
+  - stage
+  - stagiaire
+  - alternance
+  - alternant
+  - apprentissage
+  - cdi uniquement
+  - temps plein sur site
+  - presentiel obligatoire
+  - service civique
+  - benevolat
+  - benevole

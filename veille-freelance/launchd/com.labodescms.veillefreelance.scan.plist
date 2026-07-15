@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.labodescms.veillefreelance.scan</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <!-- REMPLACE le chemin ci-dessous par le chemin RÉEL vers ton venv (voir README) -->
+        <string>/Users/TON_UTILISATEUR/veille-freelance/venv/bin/python3</string>
+        <string>main.py</string>
+    </array>
+
+    <!-- REMPLACE par le chemin RÉEL vers le dossier veille-freelance/ -->
+    <key>WorkingDirectory</key>
+    <string>/Users/TON_UTILISATEUR/veille-freelance</string>
+
+    <!-- Lance le scan toutes les 4 heures (14400 secondes) -->
+    <key>StartInterval</key>
+    <integer>14400</integer>
+
+    <!-- Lance aussi un scan juste après le chargement du job (pratique pour vérifier l'install) -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/TON_UTILISATEUR/veille-freelance/logs/launchd-scan.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/TON_UTILISATEUR/veille-freelance/logs/launchd-scan.err.log</string>
+</dict>
+</plist>

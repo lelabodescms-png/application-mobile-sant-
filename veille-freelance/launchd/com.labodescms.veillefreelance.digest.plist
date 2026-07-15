@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.labodescms.veillefreelance.digest</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <!-- REMPLACE le chemin ci-dessous par le chemin RÉEL vers ton venv (voir README) -->
+        <string>/Users/TON_UTILISATEUR/veille-freelance/venv/bin/python3</string>
+        <string>main.py</string>
+        <string>--digest</string>
+    </array>
+
+    <!-- REMPLACE par le chemin RÉEL vers le dossier veille-freelance/ -->
+    <key>WorkingDirectory</key>
+    <string>/Users/TON_UTILISATEUR/veille-freelance</string>
+
+    <!-- Envoie le digest tous les jours à 9h00 -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>9</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/TON_UTILISATEUR/veille-freelance/logs/launchd-digest.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/TON_UTILISATEUR/veille-freelance/logs/launchd-digest.err.log</string>
+</dict>
+</plist>
