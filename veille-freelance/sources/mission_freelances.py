@@ -38,7 +38,8 @@ def fetch() -> list[dict]:
         if "/missions/" not in href and "/mission/" not in href:
             continue
 
-        title = link.get_text(strip=True)
+        title = link.get_text(separator=" ", strip=True)
+        title = " ".join(title.split())
         if len(title) < MIN_TITLE_LENGTH:
             continue
 
