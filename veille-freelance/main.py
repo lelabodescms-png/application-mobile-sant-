@@ -7,8 +7,13 @@ Usage :
     python main.py --now                # scan + digest immédiat (test manuel complet)
     python main.py --test-source codeur # fetch brut d'une seule source, sans écrire en base
 
-Sources disponibles pour --test-source : codeur, graphiste, remotive, freework,
+Sources disponibles pour --test-source : codeur, graphiste, remotive,
 mission_freelances, gmail
+
+Note : FreeWork (sources/freework.py) est désactivée par défaut — le site
+charge ses offres en JavaScript, un scraping HTML simple n'y récupère que
+des liens de filtres/catégories, jamais de vraies missions. Le fichier
+reste dans le dépôt si une vraie API/RSS devient disponible plus tard.
 """
 from __future__ import annotations
 
@@ -20,7 +25,7 @@ import config
 import database
 import filters
 import notifier
-from sources import codeur, freework, gmail_parser, graphiste, mission_freelances, remotive
+from sources import codeur, gmail_parser, graphiste, mission_freelances, remotive
 
 # Registre des sources : nom court -> module. C'est ICI qu'on ajoute une nouvelle
 # source (voir le README, section "Ajouter une source RSS").
@@ -28,7 +33,6 @@ SOURCES = {
     "codeur": codeur,
     "graphiste": graphiste,
     "remotive": remotive,
-    "freework": freework,
     "mission_freelances": mission_freelances,
     "gmail": gmail_parser,
 }

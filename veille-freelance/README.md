@@ -10,7 +10,7 @@ Sources agrégées en V1 :
 - **Codeur.com** (RSS)
 - **Graphiste.com** (RSS)
 - **Remotive** (RSS, remote international)
-- **FreeWork** (best-effort — pas de flux RSS fiable identifié, voir plus bas)
+- **FreeWork** (désactivée par défaut — voir section 4)
 - **Mission Freelances** (best-effort — idem)
 - **Gmail** (alertes Indeed / Welcome to the Jungle, via API OAuth)
 
@@ -107,7 +107,6 @@ motifs de détection dans `_extract_jobs_from_html()`
 python main.py --test-source codeur
 python main.py --test-source graphiste
 python main.py --test-source remotive
-python main.py --test-source freework
 python main.py --test-source mission_freelances
 python main.py --test-source gmail
 ```
@@ -117,14 +116,18 @@ elles passent les filtres (remote + mots-clés + exclusions) et leur score.
 Rien n'est écrit en base — c'est un mode 100% sans effet de bord, idéal pour
 valider qu'une source fonctionne avant de l'automatiser.
 
-**FreeWork et Mission Freelances** n'ont pas de flux RSS public confirmé au
-moment de l'écriture de cette V1 : le module fait un scraping HTML minimal
-et se désactive proprement (log + liste vide) si la structure de la page a
-changé. Si `--test-source freework` ou `--test-source mission_freelances`
-ne renvoie rien, regarde les logs (`logs/veille.log`) : soit robots.txt
-bloque l'accès, soit la page a changé de structure (dans ce cas, ajuste les
-sélecteurs dans `sources/freework.py` / `sources/mission_freelances.py`, ou
-laisse la source désactivée si tu ne l'utilises pas).
+**Mission Freelances** n'a pas de flux RSS public confirmé : le module fait
+un scraping HTML minimal et se désactive proprement (log + liste vide) si
+la structure de la page a changé. Si `--test-source mission_freelances` ne
+renvoie rien, regarde les logs (`logs/veille.log`) : soit robots.txt bloque
+l'accès, soit la page a changé de structure (ajuste alors les sélecteurs
+dans `sources/mission_freelances.py`).
+
+**FreeWork** (`sources/freework.py`) est désactivée dans `main.py` : le site
+charge ses offres en JavaScript, un scraping HTML simple n'y trouve que des
+liens de filtres/catégories, jamais de vraies missions. Le fichier reste
+dans le dépôt (testable isolément en le réimportant dans `main.py`) au cas
+où une vraie API/RSS deviendrait disponible plus tard.
 
 ---
 
