@@ -78,7 +78,12 @@ def fetch_feed(url: str, source_name: str) -> feedparser.FeedParserDict | None:
         logger.warning("[%s] robots.txt interdit l'accès à %s — source ignorée", source_name, url)
         return None
 
-    headers = {"User-Agent": config.USER_AGENT}
+    headers = {
+        "User-Agent": config.USER_AGENT,
+        # Certains serveurs (ex: Graphiste.com) renvoient une 406 si l'en-tête
+        # Accept ne précise pas explicitement accepter du XML/RSS.
+        "Accept": "application/rss+xml, application/xml, text/xml, */*;q=0.1",
+    }
     try:
         response = requests.get(url, headers=headers, timeout=config.REQUEST_TIMEOUT)
         response.raise_for_status()
