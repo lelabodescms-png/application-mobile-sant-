@@ -6,13 +6,19 @@ tes services : community management, création de sites web, design graphique,
 marketing digital, Ads (Meta/TikTok/LinkedIn/Google), création d'applications,
 UGC, et bonus (Klaviyo, CRM, email marketing, SEO).
 
-Sources agrégées en V1 :
-- **Codeur.com** (RSS)
-- **Graphiste.com** (RSS)
+Sources actives en V1 (uniquement des sources 100% gratuites pour postuler) :
 - **Remotive** (RSS, remote international)
-- **FreeWork** (désactivée par défaut — voir section 3)
-- **Mission Freelances** (best-effort — idem)
 - **Gmail** (alertes Indeed / Welcome to the Jungle, via API OAuth)
+
+Sources désactivées par défaut — code conservé dans `sources/` mais non
+utilisées par `main.py` (voir section 3) :
+- **Codeur.com / Graphiste.com** : répondre à un projet y nécessite un
+  abonnement payant (à partir de 31,90€/mois), même si parcourir les
+  offres est gratuit.
+- **Mission Freelances** : accès illimité payant (8€/mois) après 3 jours
+  d'essai gratuit.
+- **FreeWork** : le site charge ses offres en JavaScript, incompatible
+  avec notre scraping HTML simple.
 
 Malt et LinkedIn ne sont volontairement PAS scrapés (violation de leurs CGU).
 
@@ -93,10 +99,7 @@ motifs de détection dans `_extract_jobs_from_html()`
 ## 3. Tester chaque source individuellement
 
 ```bash
-python main.py --test-source codeur
-python main.py --test-source graphiste
 python main.py --test-source remotive
-python main.py --test-source mission_freelances
 python main.py --test-source gmail
 ```
 
@@ -105,18 +108,16 @@ elles passent les filtres (remote + mots-clés + exclusions) et leur score.
 Rien n'est écrit en base — c'est un mode 100% sans effet de bord, idéal pour
 valider qu'une source fonctionne avant de l'automatiser.
 
-**Mission Freelances** n'a pas de flux RSS public confirmé : le module fait
-un scraping HTML minimal et se désactive proprement (log + liste vide) si
-la structure de la page a changé. Si `--test-source mission_freelances` ne
-renvoie rien, regarde les logs (`logs/veille.log`) : soit robots.txt bloque
-l'accès, soit la page a changé de structure (ajuste alors les sélecteurs
-dans `sources/mission_freelances.py`).
+**Codeur.com, Graphiste.com et Mission Freelances** sont désactivées par
+défaut (répondre à une offre y est payant, voir section 1) mais leur code
+reste dans `sources/` — pour les réactiver, ajoute-les au dict `SOURCES`
+dans `main.py` (voir section 5, "Ajouter une nouvelle source RSS").
 
-**FreeWork** (`sources/freework.py`) est désactivée dans `main.py` : le site
-charge ses offres en JavaScript, un scraping HTML simple n'y trouve que des
-liens de filtres/catégories, jamais de vraies missions. Le fichier reste
-dans le dépôt (testable isolément en le réimportant dans `main.py`) au cas
-où une vraie API/RSS deviendrait disponible plus tard.
+**FreeWork** (`sources/freework.py`) est désactivée dans `main.py` pour une
+autre raison : le site charge ses offres en JavaScript, un scraping HTML
+simple n'y trouve que des liens de filtres/catégories, jamais de vraies
+missions. Le fichier reste dans le dépôt au cas où une vraie API/RSS
+deviendrait disponible plus tard.
 
 ---
 
@@ -244,12 +245,12 @@ veille-freelance/
 ├── main.py                   # CLI : scan / digest / --now / --test-source
 ├── sources/
 │   ├── base.py                # utilitaires HTTP/RSS/HTML mutualisés
-│   ├── codeur.py
-│   ├── graphiste.py
 │   ├── remotive.py
-│   ├── freework.py             # désactivée par défaut (voir section 3)
-│   ├── mission_freelances.py
-│   └── gmail_parser.py         # lecture des alertes + identifiants OAuth partagés
+│   ├── gmail_parser.py         # lecture des alertes + identifiants OAuth partagés
+│   ├── codeur.py               # désactivée par défaut : payant (voir section 1)
+│   ├── graphiste.py            # désactivée par défaut : payant (voir section 1)
+│   ├── mission_freelances.py   # désactivée par défaut : payant (voir section 1)
+│   └── freework.py             # désactivée par défaut : scraping JS (voir section 3)
 └── launchd/
     ├── com.labodescms.veillefreelance.scan.plist
     └── com.labodescms.veillefreelance.digest.plist

@@ -5,15 +5,19 @@ Usage :
     python main.py                      # scan seul (fetch + filtre + stockage), pas de notif
     python main.py --digest             # envoie le digest par email des offres non notifiées
     python main.py --now                # scan + digest immédiat (test manuel complet)
-    python main.py --test-source codeur # fetch brut d'une seule source, sans écrire en base
+    python main.py --test-source remotive # fetch brut d'une seule source, sans écrire en base
 
-Sources disponibles pour --test-source : codeur, graphiste, remotive,
-mission_freelances, gmail
+Sources disponibles pour --test-source : remotive, gmail
 
-Note : FreeWork (sources/freework.py) est désactivée par défaut — le site
-charge ses offres en JavaScript, un scraping HTML simple n'y récupère que
-des liens de filtres/catégories, jamais de vraies missions. Le fichier
-reste dans le dépôt si une vraie API/RSS devient disponible plus tard.
+Note : seules les sources 100% gratuites pour postuler sont actives par
+défaut. Sont désactivées (fichiers conservés dans sources/ au cas où) :
+- codeur.py / graphiste.py : répondre à un projet nécessite un abonnement
+  payant (à partir de 31,90€/mois), même si parcourir les offres est libre.
+- mission_freelances.py : accès illimité payant (8€/mois) après 3 jours
+  d'essai gratuit.
+- freework.py : le site charge ses offres en JavaScript, un scraping HTML
+  simple n'y récupère que des liens de filtres/catégories, jamais de
+  vraies missions.
 """
 from __future__ import annotations
 
@@ -25,15 +29,13 @@ import config
 import database
 import email_notifier
 import filters
-from sources import codeur, gmail_parser, graphiste, mission_freelances, remotive
+from sources import gmail_parser, remotive
 
 # Registre des sources : nom court -> module. C'est ICI qu'on ajoute une nouvelle
-# source (voir le README, section "Ajouter une source RSS").
+# source (voir le README, section "Ajouter une source RSS"). Seules les sources
+# gratuites pour postuler sont actives par défaut (voir le docstring ci-dessus).
 SOURCES = {
-    "codeur": codeur,
-    "graphiste": graphiste,
     "remotive": remotive,
-    "mission_freelances": mission_freelances,
     "gmail": gmail_parser,
 }
 
