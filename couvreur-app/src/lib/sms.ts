@@ -36,3 +36,23 @@ export async function sendSms(to: string, message: string, from: string) {
 
   return { simulated: false as const };
 }
+
+/**
+ * Envoie un SMS en essayant d'abord le Sender ID alphanumérique (nom de
+ * l'entreprise) — accepté sans démarche en France, mais refusé par de
+ * nombreux autres pays (ex : Maroc). En cas d'échec, on retente avec un
+ * numéro de téléphone Twilio classique (TWILIO_FALLBACK_FROM_NUMBER),
+ * accepté plus largement à l'international.
+ */
+export async function sendSmsWithFallback(to: string, message: string, senderId: string) {
+  try {
+    return await sendSms(to, message, senderId);
+  } catch (error) {
+    const fallbackNumber = process.env.TWILIO_FALLBACK_FROM_NUMBER;
+    if (!fallbackNumber) {
+      throw error;
+    }
+    console.error(`Sender ID alphanumérique refusé pour ${to}, tentative avec le numéro de secours.`, error);
+    return sendSms(to, message, fallbackNumber);
+  }
+}
